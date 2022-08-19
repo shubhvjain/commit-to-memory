@@ -25,3 +25,15 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+
+## Notes
+
+When the app loads, only the app module is loaded.
+The main module is the home page where links other pages are displayed.
+Modules are lazy-loaded when the user navigates from the home page.
+
+There are 3  main modules in the project:
+- `core` : this has the main functionality: creating flashcards and reviewing them 
+- `settings`: all user configurable settings. like flashcard types, review systems
+- `plugins`: additional features. like statistics, searching flashcards, creating quizzes 
