@@ -1,1 +1,5 @@
-<p>new-card works!</p>
+<div class="row" *ngIf="displayPage">
+  <div class="col-lg-6 mx-auto"> 
+    <flash-card [metadata]="metadata" mode="new" id="new"></flash-card>
+  </div>
+</div>

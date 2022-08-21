@@ -1,0 +1,36 @@
+<div *ngIf="displayCard">
+  <div *ngIf="mode == 'new'">
+    <nav class="navbar bg-light mb-3">
+      <div class="container-fluid">
+        <a class="navbar-brand">{{ display.title }}</a>
+        <div class="d-flex" role="search">
+          <select class="form-select"
+          (change)="changeNewCardType($event)"
+          >
+            <option value="none" selected>Select type</option>
+            <option value="{{cardType.name}}" *ngFor="let cardType of metadata.cardTypes">
+              {{cardType.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </nav>
+    <div class="mb-3 mt-2">
+      <label
+        for="exampleFormControlTextarea1"
+        class="form-label fw-lighter fs-5 text-muted"
+        >Example textarea</label
+      >
+      <textarea
+        class="form-control fs-4"
+        id="exampleFormControlTextarea1"
+        rows="4"
+      ></textarea>
+    </div>
+    <tag-input [(ngModel)]="items"></tag-input>
+    <button type="button" class="btn btn-outline-secondary btn-lg">
+      {{ display.action }}
+    </button>
+  </div>
+</div>
+<div *ngIf="!displayCard">Loading...</div>
