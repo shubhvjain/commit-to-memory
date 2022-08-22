@@ -29,9 +29,20 @@ export class SampleDataService {
             }
           }
         ],
-        "reviewAlgorithms": [],
+        "reviewAlgorithms": [
+          {
+            active:true,
+            name: "Sample",
+            process: "process described here",
+            descr: "this is a test",
+            feedbackInput: [],
+            initialValue: "return {dateUTC: utils.dateObjToUTC(new Date()).dateUTC } ",
+            test: { feedbackInput: "", review: "" },
+          }
+        ],
         "options": {
-          "startReviewByDefault": true
+          "startReviewByDefault": true,
+          "defaultReviewAlgorithm":"Sample"
         }
       }
     }

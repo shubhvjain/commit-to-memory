@@ -2,9 +2,9 @@
   <div *ngIf="mode == 'new'">
     <nav class="navbar bg-light mb-3">
       <div class="container-fluid">
-        <a class="navbar-brand">{{ display.title }}</a>
+        <a class="navbar-brand  fw-lighter ">{{ display.title }}</a>
         <div class="d-flex" role="search">
-          <select class="form-select"
+          <select class="form-select  fw-lighter "
           (change)="changeNewCardType($event)"
           >
             <option value="none" selected>Select type</option>
@@ -15,22 +15,88 @@
         </div>
       </div>
     </nav>
-    <div class="mb-3 mt-2">
-      <label
-        for="exampleFormControlTextarea1"
-        class="form-label fw-lighter fs-5 text-muted"
-        >Example textarea</label
-      >
-      <textarea
-        class="form-control fs-4"
-        id="exampleFormControlTextarea1"
-        rows="4"
-      ></textarea>
+
+    <div *ngFor="let formItem of formData" >
+      <ng-template [ngIf]="formItem.type=='text'">
+        <div class="mb-3 mt-2">
+          <label
+            for="exampleFormControlTextarea1"
+            class="form-label fw-lighter fs-5 text-muted"
+            >{{formItem.title}}</label>
+          <textarea
+            [(ngModel)]="cardData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5"
+            id="exampleFormControlTextarea1"
+            rows="3"
+          ></textarea>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='boolean'">
+        <div class="form-check fw-lighter fs-5">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="cardData['content'][formItem.title]" >
+          <label class="form-check-label" for="flexCheckChecked">
+            {{formItem.title}}
+          </label>
+        </div>
+      </ng-template>
     </div>
-    <tag-input [(ngModel)]="items"></tag-input>
-    <button type="button" class="btn btn-outline-secondary btn-lg">
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h6 class="card-title fw-lighter ">Metadata</h6>
+        <div class="row   fw-lighter fs-6">
+          <div class="col-lg-4 p-3">
+            Tags
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="cardData['tags']"></tag-input>
+          </div>
+        </div>
+        <div class="row mt-2  fw-lighter fs-6">
+          <div class="col-lg-4 p-2">
+            Initial Relation
+          </div>
+          <div class="col-lg-8">
+            <input type="text" class="form-control " id="exampleFormControlInput1" [(ngModel)]="initialRelation">
+          </div>
+        </div>
+
+        <div class="row  mt-2 fw-lighter fs-6">
+          <div class="col-lg-4 p-2">
+            Review schedule
+          </div>
+          <div class="col-lg-8">
+            <select class="form-select  fw-lighter " (change)="changeNewCardReviewAlgorithm($event)" >
+              <option>Select</option>
+              <option value="{{alg.name}}" *ngFor="let alg of  metadata.reviewAlgorithms" value="1">{{alg.name}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-check fw-lighter fs-6 mt-2">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="cardData['reviewEnabled']" >
+          <label class="form-check-label" for="flexCheckChecked">
+            Enable review
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <button type="button" class="btn mt-3 btn-lg btn-secondary fw-lighter fs-6" (click)="handleCardAction()" >
       {{ display.action }}
     </button>
+
+    <div  class="mt-2" *ngIf="showMessage">
+      <div class="alert alert-{{message.type}} d-flex align-items-center" role="alert">
+        <button (click)="clearMessage()" type="button" class="btn btn-sm btn-light1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+          <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+        </svg></button>
+        <div class="ps-3">
+          {{message.text}}
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 <div *ngIf="!displayCard">Loading...</div>
