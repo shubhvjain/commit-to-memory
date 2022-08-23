@@ -41,7 +41,12 @@ export class ServerDataService {
   }
  
   async getRecord(id:string){
-
+    try {
+      const dt:any = await lastValueFrom(this.http.get(this.base+"/record/"+id, this.getSecureHeader()));
+      return dt['data']['data']  
+    } catch (error) {
+      return {}
+    }
   }
 
   async searchRecord(criteria:any={"structure":"flashcard"}){
@@ -50,6 +55,11 @@ export class ServerDataService {
   }
 
   async editRecord(id:string,newData:any){
-
+    try {
+      const update = await lastValueFrom(this.http.put(this.base+"/record/"+id,newData,this.getSecureHeader()))
+      return { type: "success", message: "Saved"}
+    } catch (error:any) {
+      return { type:"danger", message: error.message  }
+    }
   }
 }

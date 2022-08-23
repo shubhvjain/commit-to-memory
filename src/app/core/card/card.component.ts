@@ -11,6 +11,7 @@ export class CardComponent implements OnInit {
   @Input() display: any;
   @Input() metadata: any;
   @Input() record: any
+  @Input() id: any
 
   cardData: any;
   formData: any;
@@ -90,15 +91,6 @@ export class CardComponent implements OnInit {
       throw new Error("Invalid card type")
     }
   }
-
-  async loadSavedCard() {
-
-  }
-
-  changeSavedCardType(newCardType: Event) {
-
-  }
-
   createFormDataFromCardMetadata(cardMetadata: any) {
     if(cardMetadata){
       const validInputTypes: any = {
@@ -147,6 +139,44 @@ export class CardComponent implements OnInit {
 
   }
 
+
+  loadSavedCardForm(savedData:any) {
+    this.formData = []
+    let dt: any = savedData['cardType']
+    const cardTypes: [any] = this.metadata['cardTypes']
+    const cardMetadata = cardTypes.find(itm => { return itm['name'] == dt })
+    if (cardMetadata) {
+      this.cardData = savedData
+      const newData = this.createFormDataFromCardMetadata(cardMetadata)
+      this.formData = newData['formData']
+      //this.cardData['content'] = savedData['content']
+      //this.cardData['cardType'] = dt
+    } else {
+      if (dt == 'none') {
+        this.cardData['content'] = this.combineCardData(this.cardData['content'], {})
+        this.cardData['cardType'] = dt
+      }else{
+        throw new Error("Invalid card type")
+      }
+    }
+  }
+
+  async loadSavedCard() {
+    try {
+      this.display = { title: "Edit card", action: "Save" }
+      const rData:any = await this.ds.getRecord(this.id)
+      if(rData){
+        this.loadSavedCardForm(rData)
+        this.displayCard = true
+      }else{
+        this.displayMessage("danger","Card not found. <a href='/'>Home</a>")
+      }
+    } catch (error) {
+        console.log(error)
+        this.displayMessage("danger","Card not found. <a href='/'>Home</a>")
+    }
+  }
+
   async handleCardAction() {
     try {
       //console.log(this.cardData)
@@ -155,6 +185,9 @@ export class CardComponent implements OnInit {
         const result = await this.ds.newRecord({ data: this.cardData, metadata: { initialRelations: this.initialRelation } })
         this.displayMessage(result.type,result.message)
         this.resetAfterInsertNew()
+      }else if (this.mode== "edit"){
+        const result = await this.ds.updateRecord(this.id,{content:this.cardData['content'] , tags:this.cardData['tags'], reviewEnabled: this.cardData['reviewEnabled']})
+        this.displayMessage(result.type,result.message)
       }
     } catch (error: any) {
       console.log(error)

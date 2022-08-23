@@ -9,13 +9,15 @@ import { CoreComponent } from './core.component';
 import { NewCardComponent } from './new-card/new-card.component';
 import { ReviewComponent } from './review/review.component';
 import { CardComponent } from './card/card.component';
+import { EditCardComponent } from './edit-card/edit-card.component';
 
 @NgModule({
   declarations: [
     CoreComponent,
     NewCardComponent,
     ReviewComponent,
-    CardComponent
+    CardComponent,
+    EditCardComponent
   ],
   imports: [
     TagInputModule,

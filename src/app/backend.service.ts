@@ -25,12 +25,14 @@ export class BackendService {
 
   }
 
-  async getRecord(){
-
+  async getRecord(id:string){
+    const recordData:any = await this.sds.getRecord(id)
+    return recordData
   }
 
-  async updateRecord(){
-
+  async updateRecord(id:string, data:any){
+    const editUpdate = await this.sds.editRecord(id,{data})
+    return editUpdate
   }
 
   getCurrentDate() {
