@@ -39,6 +39,19 @@
           </label>
         </div>
       </ng-template>
+      <ng-template [ngIf]="formItem.type=='enum'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <select class="form-select  fw-lighter " [(ngModel)]="cardData['content'][formItem.title]" >
+              <option value="none">Select</option>
+              <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
+            </select>
+          </div>
+        </div>
+      </ng-template>
     </div>
 
     <div class="card mt-4">

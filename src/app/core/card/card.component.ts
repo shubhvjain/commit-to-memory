@@ -69,8 +69,9 @@ export class CardComponent implements OnInit {
       if (dt['value'] == 'none') {
         this.cardData['content'] = this.combineCardData(this.cardData['content'], {})
         this.cardData['cardType'] = dt['value']
+      }else{
+        throw new Error("Invalid card type")
       }
-      throw new Error("Invalid card type")
     }
   }
 
@@ -95,17 +96,20 @@ export class CardComponent implements OnInit {
 
   createFormDataFromCardMetadata(cardMetadata: any) {
     const validInputTypes: any = {
-      "boolean": (defValue: any) => { return defValue ? defValue == 'true' : false },
-      "text": (defValue: any) => { return defValue ? defValue : "" }
+      "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
+      "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
+      "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } }
     }
     const inputs: [string] = cardMetadata.inputs
     let data: any = {}
     let formData: any = []
     inputs.map(itm => {
       const parts = itm.split(":")
-      let fieldValue = validInputTypes[parts.length >= 2 ? parts[1] : "text"](parts.length == 3 ? parts[2] : null)
+      let fieldMetadata = validInputTypes[parts.length >= 2 ? parts[1] : "text"](parts.length == 3 ? parts[2] : null) 
+      let fieldValue = fieldMetadata["default"]
       data[parts[0]] = fieldValue
-      formData.push({ title: parts[0], type: parts.length >= 2 ? parts[1] : "text" })
+
+      formData.push({ title: parts[0], type: parts.length >= 2 ? parts[1] : "text" , ...fieldMetadata })
     })
     return { data: data, formData }
   }
