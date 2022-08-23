@@ -7,18 +7,14 @@ import { ServerDataService } from './server-data.service';
 export class BackendService {
   constructor(public sd: SampleDataService, public sds: ServerDataService) { }
 
-  
-  
   async getMetadata(){
     const metadata = this.sd.getSample("metadata")
     return metadata["data"]
   }
 
   async searchRecords(text:string){
-    const parts = text.split(":")
-    if (parts.length == 1){
-    }else{
-    }
+    const records = await this.sds.searchRecord({})
+    return records
   }
 
   async updateMetadata(){

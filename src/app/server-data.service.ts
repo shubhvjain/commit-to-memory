@@ -50,8 +50,9 @@ export class ServerDataService {
   }
 
   async searchRecord(criteria:any={"structure":"flashcard"}){
-    const dt = await lastValueFrom( this.http.post(this.base+"/record",criteria, this.getSecureHeader()))
-    return dt 
+    criteria['structure']="flashcard"
+    const dt:any = await lastValueFrom( this.http.post(this.base+"/record",criteria, this.getSecureHeader()))
+    return dt['data']['results']
   }
 
   async editRecord(id:string,newData:any){

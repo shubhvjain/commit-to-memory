@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxSmartModalService } from 'ngx-smart-modal';
+
+import { BackendService } from 'src/app/backend.service';
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -7,14 +10,17 @@ import { NgxSmartModalService } from 'ngx-smart-modal';
 })
 export class SearchComponent implements OnInit {
 
-  constructor(public ngxSmartModalService: NgxSmartModalService) { }
+  constructor(public ngxSmartModalService: NgxSmartModalService, public ds: BackendService) { }
 
   query:string = ""
-  search(){
+  async search(){
+    // TODO only fetch fields required for displaying,  instead of fetching the whole record 
+    const results = await this.ds.searchRecords(this.query)
 
+    console.log(results)
+    this.results = results
   }
   results:[] = []
-  pageSplits:any  
 
 
   showEdit:boolean= false
