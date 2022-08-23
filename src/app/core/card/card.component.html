@@ -6,6 +6,7 @@
         <div class="d-flex" role="search">
           <select class="form-select  fw-lighter "
           (change)="changeNewCardType($event)"
+          [(ngModel)]="cardData['cardType']"
           >
             <option value="none" selected>Select type</option>
             <option value="{{cardType.name}}" *ngFor="let cardType of metadata.cardTypes">
@@ -54,9 +55,9 @@
       </ng-template>
     </div>
 
-    <div class="card mt-4">
+    <div class="card  text-bg-light border border-0 mt-4">
       <div class="card-body">
-        <h6 class="card-title fw-lighter ">Metadata</h6>
+        <!-- <h6 class="card-title fw-lighter ">Metadata</h6> -->
         <div class="row   fw-lighter fs-6">
           <div class="col-lg-4 p-3">
             Tags
@@ -104,9 +105,7 @@
         <button (click)="clearMessage()" type="button" class="btn btn-sm btn-light1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
           <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
         </svg></button>
-        <div class="ps-3">
-          {{message.text}}
-        </div>
+        <div class="ps-3" [innerHTML]="message.text"></div>
       </div>
     </div>
 

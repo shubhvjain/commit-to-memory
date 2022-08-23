@@ -48,9 +48,14 @@ export class CardComponent implements OnInit {
   newCardType: any;
   initialRelation: string;
 
+  resetFormData(){
+    this.formData = []
+  }
+
   loadNewCard() {
     //const samp = this.metadata.cardTypes[0]
     //console.log(this.createFormDataFromCardMetadata(samp))
+    this.resetFormData()
     this.cardData = this.ds.newRecordObject()
     this.displayCard = true
   }
@@ -95,23 +100,27 @@ export class CardComponent implements OnInit {
   }
 
   createFormDataFromCardMetadata(cardMetadata: any) {
-    const validInputTypes: any = {
-      "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
-      "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
-      "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } }
+    if(cardMetadata){
+      const validInputTypes: any = {
+        "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
+        "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
+        "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } }
+      }
+      const inputs: [string] = cardMetadata.inputs
+      let data: any = {}
+      let formData: any = []
+      inputs.map(itm => {
+        const parts = itm.split(":")
+        let fieldMetadata = validInputTypes[parts.length >= 2 ? parts[1] : "text"](parts.length == 3 ? parts[2] : null) 
+        let fieldValue = fieldMetadata["default"]
+        data[parts[0]] = fieldValue
+  
+        formData.push({ title: parts[0], type: parts.length >= 2 ? parts[1] : "text" , ...fieldMetadata })
+      })
+      return { data: data, formData }
+    }else{
+      return {data:{},formData:[]}
     }
-    const inputs: [string] = cardMetadata.inputs
-    let data: any = {}
-    let formData: any = []
-    inputs.map(itm => {
-      const parts = itm.split(":")
-      let fieldMetadata = validInputTypes[parts.length >= 2 ? parts[1] : "text"](parts.length == 3 ? parts[2] : null) 
-      let fieldValue = fieldMetadata["default"]
-      data[parts[0]] = fieldValue
-
-      formData.push({ title: parts[0], type: parts.length >= 2 ? parts[1] : "text" , ...fieldMetadata })
-    })
-    return { data: data, formData }
   }
 
   combineCardData(oldData: any, newData: any) {
@@ -122,6 +131,19 @@ export class CardComponent implements OnInit {
   }
 
   async loadCardPreview() {
+    
+  }
+
+  resetAfterInsertNew(){
+    // retain metadata
+    const dataToRetain = {
+      tags : this.cardData['tags'],
+      reviewAlgorithm : this.cardData['reviewAlgorithm'],
+    }
+    this.loadNewCard()
+    this.cardData['tags'] = dataToRetain.tags
+    this.cardData['reviewAlgorithm'] = dataToRetain.reviewAlgorithm
+    // also inital relation but that is anyways stored seperately 
 
   }
 
@@ -130,8 +152,9 @@ export class CardComponent implements OnInit {
       //console.log(this.cardData)
       this.clearMessage()
       if (this.mode == "new") {
-        await this.ds.newRecord({ data: this.cardData, metadata: { initialRelations: this.initialRelation } })
-        // this.displayMessage("danger","Danger...")
+        const result = await this.ds.newRecord({ data: this.cardData, metadata: { initialRelations: this.initialRelation } })
+        this.displayMessage(result.type,result.message)
+        this.resetAfterInsertNew()
       }
     } catch (error: any) {
       console.log(error)
