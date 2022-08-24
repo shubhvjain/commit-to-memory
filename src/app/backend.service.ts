@@ -47,6 +47,7 @@ export class BackendService {
       tags: [],
       reviewAlgorithm: "none",
       reviewEnabled: true,
+      reviewDateUTC:0,
       review: {},
       reviewHistory: [],
     }
@@ -82,5 +83,10 @@ export class BackendService {
     this.validateNewRecord(requestData)
     const newRecord:any = await this.sds.newRecord(requestData)
     return { type:'success', message: ` Card created. <a href="/core/edit/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Edit</a>`}
+  }
+
+  async reviewList(){
+    const rec = await this.sds.reviewList({})
+    return rec
   }
 }
