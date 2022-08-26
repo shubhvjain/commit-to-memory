@@ -89,4 +89,8 @@ export class BackendService {
     const rec = await this.sds.reviewList({})
     return rec
   }
+
+  getServerConfig(){
+    return this.sds.getConfigs()
+  }
 }

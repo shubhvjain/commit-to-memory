@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BackendService } from 'src/app/backend.service';
 
 @Component({
@@ -12,6 +12,7 @@ export class CardComponent implements OnInit {
   @Input() metadata: any;
   @Input() record: any
   @Input() id: any
+  @Output() afterReviewDone = new EventEmitter<any>();
 
   cardData: any;
   formData: any;
@@ -23,12 +24,18 @@ export class CardComponent implements OnInit {
     this.initialRelation = ""
   }
   ngOnInit(): void {
+    //console.log()
     // load metadata
     // initialize data 
     this.loadCard()
 
   }
+  ngOnChanges(){
+    this.loadCard()
+  }
+
   async loadCard() {
+    this.displayCard = false;
     if (!this.metadata) {
       this.metadata = await this.ds.getMetadata()
     }
@@ -39,8 +46,12 @@ export class CardComponent implements OnInit {
     } else {
       // mode = edit or preview
       await this.loadSavedCard()
+      
       if (this.mode == 'preview') {
         await this.loadCardPreview()
+      }
+      if (this.mode == 'review'){
+        await this.loadCardReview()
       }
     }
   }
@@ -59,6 +70,12 @@ export class CardComponent implements OnInit {
     this.resetFormData()
     this.cardData = this.ds.newRecordObject()
     this.displayCard = true
+  }
+
+  getCardTypeMetadata(){
+    const cardTypes: [any] = this.metadata['cardTypes']
+    const cardMetadata = cardTypes.find(itm => { return itm['name'] == this.cardData['cardType'] })
+    return cardMetadata
   }
 
   changeNewCardType(newCardType: Event) {
@@ -91,25 +108,32 @@ export class CardComponent implements OnInit {
       throw new Error("Invalid card type")
     }
   }
-  createFormDataFromCardMetadata(cardMetadata: any) {
-    if(cardMetadata){
-      const validInputTypes: any = {
-        "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
-        "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
-        "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } }
-      }
-      const inputs: [string] = cardMetadata.inputs
-      let data: any = {}
+
+  validInputTypes: any = {
+    "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
+    "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
+    "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } }
+  }
+
+  convertInputToFormData(inputs:[string]){
+    let data: any = {}
       let formData: any = []
       inputs.map(itm => {
         const parts = itm.split(":")
-        let fieldMetadata = validInputTypes[parts.length >= 2 ? parts[1] : "text"](parts.length == 3 ? parts[2] : null) 
+        let fieldMetadata = this.validInputTypes[parts.length >= 2 ? parts[1] : "text"](parts.length == 3 ? parts[2] : null) 
         let fieldValue = fieldMetadata["default"]
         data[parts[0]] = fieldValue
   
         formData.push({ title: parts[0], type: parts.length >= 2 ? parts[1] : "text" , ...fieldMetadata })
       })
       return { data: data, formData }
+  }
+
+  createFormDataFromCardMetadata(cardMetadata: any) {
+    if(cardMetadata){
+      const inputs: [string] = cardMetadata.inputs
+      const dt = this.convertInputToFormData(inputs)
+      return dt
     }else{
       return {data:{},formData:[]}
     }
@@ -122,7 +146,70 @@ export class CardComponent implements OnInit {
     return data
   }
 
+
+  generateFlashcardView(cardTypeMetaData:any, fcData:any, options:{iframeName:string}) {
+    const serverConfig = this.ds.getServerConfig()
+    const dataInput = fcData;
+    let defHTML = ` 
+        <script src="${serverConfig.staticFilesUrl}/scripts/codescripts.js"> </script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <div id='result'></div>  `;
+    let jsPart = `  
+        <script type='text/javascript'> 
+        var height;
+        resize = () => {
+          if (height !== document.getElementById('result').offsetHeight) {
+            let iframeName = "${options.iframeName}"
+            height = document.getElementById('result').offsetHeight;
+            window.parent.postMessage({
+              frameHeight: height,
+              iframeName: iframeName
+            }, '*');
+          }
+        }
+        window.onresize = () => resize();
+        window.onload= async function(){
+          resize()
+      function print(data=""){
+        let pr = data;
+        if(typeof data== "object"){pr = "<pre>"+JSON.stringify(data,null,1)+'<\pre>'}
+        document.getElementById("result").innerHTML += pr
+        resize()
+      }
+          async function loadJS(file){
+            return new Promise((resolve,reject)=>{
+              let a = this;let myScript = document.createElement("script");myScript.setAttribute("src",file);document.body.appendChild(myScript);myScript.addEventListener("load", scriptLoaded, false);
+              function scriptLoaded() {resolve()}
+            })
+        }
+        function loadCSS(file){var fileref = document.createElement("link");fileref.rel = "stylesheet";fileref.type = "text/css";fileref.href = file;document.getElementsByTagName("head")[0].appendChild(fileref);}
+
+        const reviewData = {
+          input: ${JSON.stringify(dataInput)},
+          cardTypeMetadata:  ${JSON.stringify(cardTypeMetaData)}
+        }
+          ${cardTypeMetaData["display"]}
+        }
+        </script>`;
+    let qw = defHTML + jsPart;
+    return qw;
+  }
+
+  previewIframeName="cardPreviewIframe"
+
   async loadCardPreview() {
+    //console.log("sampe")
+    const meta = this.getCardTypeMetadata()
+    const preview = this.generateFlashcardView(meta,this.cardData['content'],{iframeName:this.previewIframeName})
+    if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
+
+    const ifr:any = document.getElementById("cardPreviewIframe")
+        if (ifr) {
+          var code = ifr['contentWindow'].document;
+          code.open();
+          code.write(preview);
+          code.close();
+        }
     
   }
 
@@ -195,7 +282,6 @@ export class CardComponent implements OnInit {
     }
   }
 
-
   // Use this for common messaging 
   showMessage: boolean = false;
   message: { type: string, text: string } = { text: "", type: "" }
@@ -209,4 +295,86 @@ export class CardComponent implements OnInit {
 
   }
 
+  reviewForm:any = []
+  reviewData:any = {}
+  reviewDone:boolean = false;
+
+  getReviewAlgorithmData(){
+    const cardTypes: [any] = this.metadata['reviewAlgorithms']
+    // console.log(this.cardData)
+    const cardMetadata = cardTypes.find(itm => { return itm['name'] == this.cardData['reviewAlgorithm'] })
+    return cardMetadata
+  }
+
+  async loadCardReview(){
+    // get review algorithm metadata feedbackInput
+    const alg:any = this.getReviewAlgorithmData()
+    const rd = this.convertInputToFormData(alg['feedbackInput'])
+    this.reviewForm = rd.formData
+    this.reviewData = rd.data
+    const ang = this
+    setTimeout(async function(){
+      await ang.loadCardPreview()
+    },200)
+  }
+
+  async saveReview() {
+    try {
+      await this.processReview()
+      this.afterReviewDone.emit({ reviewDone: true })
+    } catch (error:any) {
+      this.displayMessage("danger",error.message)
+    }
+  }
+
+  getUtilityFunction(){
+    const utils = ` {
+      addDaysToDate: (date, dayToAdd) => {
+        var someDate = new Date(date);
+        someDate.setDate(someDate.getDate() + dayToAdd);
+        return someDate;
+      },
+      convertToUTC : (date) => {
+        return Math.floor(new Date(date).getTime() / 1000)
+      }
+    }`
+    return utils
+  }
+
+  validateReviewedData(data:any){
+    const reqFields = ['reviewDateUTC','review','history']
+    reqFields.map(i=>{if(!data[i]){throw 'Validation error' }})
+  }
+
+  async processReview() {
+  
+
+      // get the review function
+      const reviewScript = this.getReviewAlgorithmData()['process']
+      const fullSrcipt = `
+      const input = {
+        cardData: ${JSON.stringify(this.cardData)},
+        reviewInput: ${JSON.stringify(this.reviewData)}
+      }
+      const util = ${this.getUtilityFunction()}
+      ${reviewScript}`
+      // run the review function 
+      try {
+        const reviewMethod = new Function(fullSrcipt);
+        const reviewedData = reviewMethod()
+        this.validateReviewedData(reviewedData)
+        this.cardData['reviewHistory'].push(reviewedData['history'])
+        const dataToSave = {
+          review : JSON.parse(JSON.stringify(this.combineCardData(this.cardData['review'],reviewedData['review']))),
+          reviewHistory: this.cardData['reviewHistory'],
+          reviewDateUTC: reviewedData['reviewDateUTC']
+        }
+        console.log(dataToSave)
+        const result = await this.ds.updateRecord(this.id,dataToSave)
+        // save the review results   
+      } catch (error) {
+        console.log(error)
+        throw error
+      }    
+  }
 }

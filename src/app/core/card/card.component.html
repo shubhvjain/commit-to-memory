@@ -190,6 +190,60 @@
       {{ display.action }}
     </button>
   </div>
+  <div *ngIf="mode=='review'">
+    <div class="card m-1 text-bg-light border border-0 mt-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="row"  *ngFor="let formItem of reviewForm"  >
+              <div class="col-lg-12">
+                <ng-template [ngIf]="formItem.type=='text'">
+                  <div class="mb-3 mt-2">
+                    <label
+                      for="exampleFormControlTextarea1"
+                      class="form-label fw-lighter fs-5 text-muted"
+                      >{{formItem.title}}</label>
+                    <textarea
+                      [(ngModel)]="reviewData[formItem.title]"
+                      class="form-control fw-lighter fs-5"
+                      id="exampleFormControlTextarea1"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </ng-template>
+                <ng-template [ngIf]="formItem.type=='boolean'">
+                  <div class="form-check fw-lighter fs-5">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="reviewData[formItem.title]" >
+                    <label class="form-check-label" for="flexCheckChecked">
+                      {{formItem.title}}
+                    </label>
+                  </div>
+                </ng-template>
+                <ng-template [ngIf]="formItem.type=='enum'">
+                  <div class="row  mt-2 fw-lighter fs-5">
+                    <div class="col-lg-3 p-2">
+                      {{formItem.title}}
+                    </div>
+                    <div class="col-lg-9">
+                      <select class="form-select  fw-lighter " [(ngModel)]="reviewData[formItem.title]" >
+                        <option value="none">Select</option>
+                        <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 p-2">
+            <button (click)="saveReview()" type="button" class="btn btn-dark  fw-lighter ">Review</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <button (click)="loadCardPreview()">load</button> -->
+    <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>
+  </div>
 </div>
 <div *ngIf="!displayCard">Loading...</div>
 <div  class="mt-2" *ngIf="showMessage">

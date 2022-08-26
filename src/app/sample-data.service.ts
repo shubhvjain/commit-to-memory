@@ -34,9 +34,16 @@ export class SampleDataService {
           {
             active:true,
             name: "Sample",
-            process: "process described here",
+            process: `// const input = { cardData:{ content,_id,review, reviewDateUTC, etc... },  reviewInput:{...whatever review input } }
+            // const util {addDaysToDate, dateToUTC} }
+            return  {
+              reviewDateUTC: util.convertToUTC(util.addDaysToDate(new Date(), 2)),
+              review: {sample:1},
+              history: {no:1}
+            }
+            `,
             descr: "this is a test",
-            feedbackInput: [],
+            feedbackInput: ["level:enum:easy,medium,hard"],
             initialValue: "return {dateUTC: utils.dateObjToUTC(new Date()).dateUTC } ",
             test: { feedbackInput: "", review: "" },
           }

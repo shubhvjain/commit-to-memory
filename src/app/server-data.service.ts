@@ -9,7 +9,17 @@ import { lastValueFrom } from 'rxjs';
 export class ServerDataService {
   constructor(private http: HttpClient) { }
 
-  base:string = "https://svja.in.net" 
+  // base:string = "https://svja.in.net" 
+  base:string = "http://localhost:4020" 
+
+  getConfigs(){
+    const configs = {
+      mediaBaseUrl:"http://localhost:4020",
+      dataBaseUrl:"http://localhost:4020",
+      staticFilesUrl:"https://static.svja.in"
+    }
+    return configs
+  }
 
   checkLogin(){
     const localCheck = this.getUserToken()
@@ -61,6 +71,15 @@ export class ServerDataService {
       return { type: "success", message: "Saved"}
     } catch (error:any) {
       return { type:"danger", message: error.message  }
+    }
+  }
+
+  async reviewList(data:any={}){
+    try {
+      const req:any = await lastValueFrom(this.http.post(this.base+"/service/"+this.getUserToken().user+"/reviewCardList",data,this.getSecureHeader()))
+      return req['data']
+    } catch (error:any) {
+      return { type: "danger", message: error.message}
     }
   }
 }
