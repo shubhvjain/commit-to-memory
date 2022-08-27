@@ -3,7 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  backendServerUrl:"http://localhost:4020",
+  serverConfigs: {
+    mediaBaseUrl:"http://localhost:4020",
+    dataBaseUrl:"http://localhost:4020",
+    staticFilesUrl:"https://static.svja.in"
+  }
 };
 
 /*
