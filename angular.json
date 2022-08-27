@@ -105,5 +105,7 @@
       }
     }
   },
-  "defaultProject": "commit-to-memory"
+  "cli": {
+    "analytics": false
+  }
 }
