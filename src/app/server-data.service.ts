@@ -42,7 +42,8 @@ export class ServerDataService {
   }
 
   async getMetaData(){
-
+    const req:any = await lastValueFrom(this.http.post(this.base+"/service/"+this.getUserToken().user+"/resetSettings",{},this.getSecureHeader()))
+    return req['data']
   }
 
   async newRecord(data:any){

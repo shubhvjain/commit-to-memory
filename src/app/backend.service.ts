@@ -8,8 +8,9 @@ export class BackendService {
   constructor(public sd: SampleDataService, public sds: ServerDataService) { }
 
   async getMetadata(){
-    const metadata = this.sd.getSample("metadata")
-    return metadata["data"]
+    const metadata = await this.sds.getMetaData()
+    return metadata
+
   }
 
   async searchRecords(text:string){

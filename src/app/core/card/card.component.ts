@@ -347,34 +347,32 @@ export class CardComponent implements OnInit {
   }
 
   async processReview() {
-  
-
-      // get the review function
-      const reviewScript = this.getReviewAlgorithmData()['process']
-      const fullSrcipt = `
-      const input = {
-        cardData: ${JSON.stringify(this.cardData)},
-        reviewInput: ${JSON.stringify(this.reviewData)}
-      }
-      const util = ${this.getUtilityFunction()}
-      ${reviewScript}`
-      // run the review function 
-      try {
-        const reviewMethod = new Function(fullSrcipt);
-        const reviewedData = reviewMethod()
-        this.validateReviewedData(reviewedData)
-        this.cardData['reviewHistory'].push(reviewedData['history'])
-        const dataToSave = {
-          review : JSON.parse(JSON.stringify(this.combineCardData(this.cardData['review'],reviewedData['review']))),
-          reviewHistory: this.cardData['reviewHistory'],
-          reviewDateUTC: reviewedData['reviewDateUTC']
+        // get the review function
+        const reviewScript = this.getReviewAlgorithmData()['process']
+        const fullSrcipt = `
+        const input = {
+          cardData: ${JSON.stringify(this.cardData)},
+          reviewInput: ${JSON.stringify(this.reviewData)}
         }
-        console.log(dataToSave)
-        const result = await this.ds.updateRecord(this.id,dataToSave)
-        // save the review results   
-      } catch (error) {
-        console.log(error)
-        throw error
-      }    
+        const util = ${this.getUtilityFunction()}
+        ${reviewScript}`
+        // run the review function 
+        try {
+          const reviewMethod = new Function(fullSrcipt);
+          const reviewedData = reviewMethod()
+          this.validateReviewedData(reviewedData)
+          this.cardData['reviewHistory'].push(reviewedData['history'])
+          const dataToSave = {
+            review : JSON.parse(JSON.stringify(this.combineCardData(this.cardData['review'],reviewedData['review']))),
+            reviewHistory: this.cardData['reviewHistory'],
+            reviewDateUTC: reviewedData['reviewDateUTC']
+          }
+          console.log(dataToSave)
+          const result = await this.ds.updateRecord(this.id,dataToSave)
+          // save the review results   
+        } catch (error) {
+          console.log(error)
+          throw error
+        }    
   }
 }
