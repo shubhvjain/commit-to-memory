@@ -7,6 +7,10 @@ import { ServerDataService } from './server-data.service';
 export class BackendService {
   constructor(public sd: SampleDataService, public sds: ServerDataService) { }
 
+  async login(u:string,p:string){
+    await this.sds.handleLogin(u,p)
+  }
+
   async getMetadata(){
     const metadata = await this.sds.getMetaData()
     return metadata
@@ -93,5 +97,10 @@ export class BackendService {
 
   getServerConfig(){
     return this.sds.getConfigs()
+  }
+
+  async deleteCard(id:string){
+   const req =  await this.sds.deleteCard(id)
+   return req
   }
 }

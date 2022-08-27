@@ -39,7 +39,7 @@ export class CardComponent implements OnInit {
     if (!this.metadata) {
       this.metadata = await this.ds.getMetadata()
     }
-    // console.log(this.metadata)
+    console.log(this.metadata)
     //mode = new
     if (this.mode == 'new') {
       this.loadNewCard()
