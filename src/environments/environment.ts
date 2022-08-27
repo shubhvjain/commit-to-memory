@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  backendServerUrl:"http://localhost:4020",
+  backendServerUrl1:"http://localhost:4020",
+  backendServerUrl:"https://svja.in.net",
+
   serverConfigs: {
     mediaBaseUrl:"http://localhost:4020",
     dataBaseUrl:"http://localhost:4020",

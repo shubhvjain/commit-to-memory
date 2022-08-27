@@ -39,7 +39,7 @@ export class CardComponent implements OnInit {
     if (!this.metadata) {
       this.metadata = await this.ds.getMetadata()
     }
-    console.log(this.metadata)
+    //console.log(this.metadata)
     //mode = new
     if (this.mode == 'new') {
       this.loadNewCard()
@@ -48,7 +48,11 @@ export class CardComponent implements OnInit {
       await this.loadSavedCard()
       
       if (this.mode == 'preview') {
-        await this.loadCardPreview()
+        const ang = this
+        setTimeout(async function(){
+          await ang.loadCardPreview()
+        },100)
+        
       }
       if (this.mode == 'review'){
         await this.loadCardReview()
@@ -78,11 +82,24 @@ export class CardComponent implements OnInit {
     return cardMetadata
   }
 
+  cardHelp=""
+  updateCardHelp(metadata:any){
+    //console.log(metadata)
+    if(metadata){
+      this.cardHelp = `**How to use this card?** 
+${metadata.displayHelp}
+${metadata.inputHelp}`
+    }else{
+      this.cardHelp = ""
+    }
+  }
+
   changeNewCardType(newCardType: Event) {
     this.formData = []
     let dt: any = newCardType.target
     const cardTypes: [any] = this.metadata['cardTypes']
     const cardMetadata = cardTypes.find(itm => { return itm['name'] == dt['value'] })
+    this.updateCardHelp(cardMetadata)
     if (cardMetadata) {
       const newData = this.createFormDataFromCardMetadata(cardMetadata)
       this.formData = newData['formData']
@@ -198,7 +215,6 @@ export class CardComponent implements OnInit {
   previewIframeName="cardPreviewIframe"
 
   async loadCardPreview() {
-    //console.log("sampe")
     const meta = this.getCardTypeMetadata()
     const preview = this.generateFlashcardView(meta,this.cardData['content'],{iframeName:this.previewIframeName})
     if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
@@ -232,6 +248,7 @@ export class CardComponent implements OnInit {
     let dt: any = savedData['cardType']
     const cardTypes: [any] = this.metadata['cardTypes']
     const cardMetadata = cardTypes.find(itm => { return itm['name'] == dt })
+    this.updateCardHelp(cardMetadata)
     if (cardMetadata) {
       this.cardData = savedData
       const newData = this.createFormDataFromCardMetadata(cardMetadata)
@@ -315,7 +332,7 @@ export class CardComponent implements OnInit {
     const ang = this
     setTimeout(async function(){
       await ang.loadCardPreview()
-    },200)
+    },100)
   }
 
   async saveReview() {

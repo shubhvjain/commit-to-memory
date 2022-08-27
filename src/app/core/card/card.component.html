@@ -17,13 +17,18 @@
       </div>
     </nav>
 
+    <details class="fw-lighter">
+      <summary>Help</summary>
+      <div class="fw-lighter" [innerHTML]="cardHelp | markdown"></div>
+    </details>
+
     <div *ngFor="let formItem of formData" >
       <ng-template [ngIf]="formItem.type=='text'">
         <div class="mb-3 mt-2">
           <label
             for="exampleFormControlTextarea1"
             class="form-label fw-lighter fs-5 text-muted"
-            >{{formItem.title}}</label>
+            >{{formItem.title}}:</label>
           <textarea
             [(ngModel)]="cardData['content'][formItem.title]"
             class="form-control fw-lighter fs-5"
@@ -119,13 +124,18 @@
       </div>
     </nav>
 
+    <details class="fw-lighter">
+      <summary>Help</summary>
+      <div class="fw-lighter" [innerHTML]="cardHelp | markdown"></div>
+    </details>
+
     <div *ngFor="let formItem of formData" >
       <ng-template [ngIf]="formItem.type=='text'">
         <div class="mb-3 mt-2">
           <label
             for="exampleFormControlTextarea1"
             class="form-label fw-lighter fs-5 text-muted"
-            >{{formItem.title}}</label>
+            >{{formItem.title}}:</label>
           <textarea
             [(ngModel)]="cardData['content'][formItem.title]"
             class="form-control fw-lighter fs-5"
@@ -243,6 +253,9 @@
     </div>
     <!-- <button (click)="loadCardPreview()">load</button> -->
     <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>
+  </div>
+  <div *ngIf="mode=='preview'">
+       <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>
   </div>
 </div>
 <div *ngIf="!displayCard">Loading...</div>

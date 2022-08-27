@@ -10,7 +10,7 @@ const routes: Routes = [
   { path: '', component: CoreComponent },
   { path: 'new', component: NewCardComponent },
   { path: 'review', component: ReviewComponent },
-  { path: 'edit/:id', component: EditCardComponent},
+  { path: ':mode/:id', component: EditCardComponent},
   {path: 'login',component: LoginComponent}
 ];
 

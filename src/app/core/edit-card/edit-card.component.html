@@ -1,4 +1,4 @@
-<div class="row fw-lighter">
+<div class="row fw-lighter" *ngIf="!iframeMode">
   <div class="col-lg-8 mx-auto">
     <nav class="navbar navbar-expand-sm bg-light p-1">
       <div class="container-fluid">
@@ -25,6 +25,6 @@
 </div>
 <div class="row mt-2" *ngIf="displayPage">
   <div class="col-lg-6 mx-auto"> 
-    <flash-card [metadata]="metadata" mode="edit" [id]="id"></flash-card>
+    <flash-card [metadata]="metadata" [mode]="mode" [id]="id"></flash-card>
   </div>
 </div>

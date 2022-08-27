@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { TagInputModule } from 'ngx-chips';
-import { FormsModule } from '@angular/forms';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { CoreRoutingModule } from './core-routing.module';
 import { CoreComponent } from './core.component';
@@ -23,6 +24,7 @@ import { LoginComponent } from './login/login.component';
   ],
   imports: [
     TagInputModule,
+    MarkdownModule.forRoot(), 
     FormsModule,
     CommonModule,
     CoreRoutingModule
