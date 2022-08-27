@@ -2,22 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServerDataService {
-  constructor(private http: HttpClient) { }
-
-  // base:string = "https://svja.in.net" 
-  base:string = "http://localhost:4020" 
+  constructor(private http: HttpClient) { 
+    this.base = environment.backendServerUrl
+  }
+  base:string = "" 
 
   getConfigs(){
-    const configs = {
-      mediaBaseUrl:"http://localhost:4020",
-      dataBaseUrl:"http://localhost:4020",
-      staticFilesUrl:"https://static.svja.in"
-    }
+    const configs = environment.serverConfigs
     return configs
   }
 
