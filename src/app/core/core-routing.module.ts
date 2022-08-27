@@ -4,12 +4,14 @@ import { CoreComponent } from './core.component';
 import { NewCardComponent } from './new-card/new-card.component';
 import { ReviewComponent } from './review/review.component';
 import { EditCardComponent } from './edit-card/edit-card.component';
+import { LoginComponent } from './login/login.component';
 
 const routes: Routes = [
   { path: '', component: CoreComponent },
   { path: 'new', component: NewCardComponent },
   { path: 'review', component: ReviewComponent },
-  { path: 'edit/:id', component: EditCardComponent}
+  { path: 'edit/:id', component: EditCardComponent},
+  {path: 'login',component: LoginComponent}
 ];
 
 @NgModule({

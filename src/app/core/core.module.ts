@@ -10,6 +10,7 @@ import { NewCardComponent } from './new-card/new-card.component';
 import { ReviewComponent } from './review/review.component';
 import { CardComponent } from './card/card.component';
 import { EditCardComponent } from './edit-card/edit-card.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { EditCardComponent } from './edit-card/edit-card.component';
     NewCardComponent,
     ReviewComponent,
     CardComponent,
-    EditCardComponent
+    EditCardComponent,
+    LoginComponent
   ],
   imports: [
     TagInputModule,

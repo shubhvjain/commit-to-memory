@@ -3,15 +3,40 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
+import { Router } from '@angular/router'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServerDataService {
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient,private router: Router,) { 
     this.base = environment.backendServerUrl
   }
   base:string = "" 
+
+  getNormalHeaders() {
+    return { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+  }
+  async handleLogin(u:string,p:string){
+    let login = false
+    try {
+      const logReq:any = await lastValueFrom(this.http.post(this.base + "/user1/login", {username: u, password: p, remember: true}, this.getNormalHeaders()))
+      console.log(logReq)
+      if(logReq['success']){
+        this.saveLoggedinUserData(u,logReq['data']['token'])
+        login = true
+        this.redirectTo(['']);
+      }
+      return  {login}
+    } catch (error:any) {
+      return {login, message:error.message}
+    }
+  }
+
+  saveLoggedinUserData(user:string, token:string) {
+    localStorage.setItem('user', user);
+    localStorage.setItem('token', token);
+  }
 
   getConfigs(){
     const configs = environment.serverConfigs
@@ -38,9 +63,25 @@ export class ServerDataService {
     }
   }
 
+  checkErrorForAuthentication(err:any){
+    if (err.error && err.error.error.code) {
+      if (err['status'] == 403 || err['error']['error']['code'] == 'unauthorized' || err['error']['error']['message'] == "Unauthorized access") {
+        this.redirectTo(['core','login']);
+      }
+    }
+  }
+
+  redirectTo(page:string[]) {
+    this.router.navigate(page);
+  }
+
   async getMetaData(){
-    const req:any = await lastValueFrom(this.http.post(this.base+"/service/"+this.getUserToken().user+"/resetSettings",{},this.getSecureHeader()))
-    return req['data']
+    try {
+      const req:any = await lastValueFrom(this.http.post(this.base+"/service/"+this.getUserToken().user+"/resetSettings",{},this.getSecureHeader()))
+      return req['data']['data']     
+    } catch (error) {
+      this.checkErrorForAuthentication(error)
+    }
   }
 
   async newRecord(data:any){
@@ -79,5 +120,10 @@ export class ServerDataService {
     } catch (error:any) {
       return { type: "danger", message: error.message}
     }
+  }
+
+  async deleteCard(id:string){
+    const req = await lastValueFrom(this.http.delete(this.base+"/record/"+id ,this.getSecureHeader()))
+    return req
   }
 }

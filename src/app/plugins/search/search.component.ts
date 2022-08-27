@@ -51,4 +51,22 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  removeFromResults(id:string){
+    const index  = this.results.findIndex(item=>{return item['_id']==id})
+    if (index > -1) {
+      this.results.splice(index, 1);
+    }
+  }
+
+  async delete(id:string){
+    try {
+      if (window.confirm('Are you sure ?')) {
+        const res = await this.ds.deleteCard(id)
+        this.removeFromResults(id)
+      } 
+    } catch (error) {
+      console.log(error) 
+    }
+  }
+
 }
