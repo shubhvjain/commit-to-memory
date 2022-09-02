@@ -169,7 +169,19 @@ ${metadata.inputHelp}`
     const dataInput = fcData;
     let defHTML = ` 
         <script src="${serverConfig.staticFilesUrl}/scripts/codescripts.js"> </script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script>
+        MathJax.Hub.Config({
+          showMathMenu: true,
+          tex2jax: { inlineMath: [["$", "$"]],displayMath:[["$$", "$$"]] },
+          menuSettings: { zoom: "Double-Click", zscale: "150%" },
+          CommonHTML: { linebreaks: { automatic: true } },
+          "HTML-CSS": { linebreaks: { automatic: true } },
+          SVG: { linebreaks: { automatic: true } }
+        });
+      </script>
         <div id='result'></div>  `;
     let jsPart = `  
         <script type='text/javascript'> 
@@ -200,7 +212,12 @@ ${metadata.inputHelp}`
             })
         }
         function loadCSS(file){var fileref = document.createElement("link");fileref.rel = "stylesheet";fileref.type = "text/css";fileref.href = file;document.getElementsByTagName("head")[0].appendChild(fileref);}
-
+        function mdToHTML(text){
+          return marked.parse(text)
+        }
+        function renderMaths(){
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub])
+        }
         const reviewData = {
           input: ${JSON.stringify(dataInput)},
           cardTypeMetadata:  ${JSON.stringify(cardTypeMetaData)}
