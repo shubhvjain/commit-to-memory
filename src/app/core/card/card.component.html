@@ -58,6 +58,16 @@
           </div>
         </div>
       </ng-template>
+      <ng-template [ngIf]="formItem.type=='tags'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="cardData['content'][formItem.title]"></tag-input>
+          </div>
+        </div>
+      </ng-template>      
     </div>
 
     <div class="card  text-bg-light border border-0 mt-4">
@@ -165,6 +175,16 @@
           </div>
         </div>
       </ng-template>
+      <ng-template [ngIf]="formItem.type=='tags'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="cardData['content'][formItem.title]"></tag-input>
+          </div>
+        </div>
+      </ng-template>  
     </div>
     <div class="card  text-bg-light border border-0 mt-4">
       <div class="card-body">
