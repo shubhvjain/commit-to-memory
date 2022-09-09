@@ -29,11 +29,12 @@
       <div class="d-flex border-bottom">
         <div class="p-2 flex-grow-1"></div>
         <div class="p-2">
+        ({{currentIndex+1}} or {{reviewIds.length}}  cards) 
           <button (click)="loadNextCard()" type="button" class="btn btn-light fw-lighter">Next</button>
         </div>
       </div>
       <div *ngIf="loadCardPreview">
-        <flash-card  (afterReviewDone)="handleAfterReview($event)" [metadata]="metadata" mode="review" [id]="cards.records[currentIndex]['_id']"></flash-card>
+        <flash-card  (afterReviewDone)="handleAfterReview($event)" [metadata]="metadata" mode="review" [id]="reviewIds[currentIndex]"></flash-card>
       </div>
 
     </div>
