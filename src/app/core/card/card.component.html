@@ -222,7 +222,7 @@
     <details class=" p-2 fw-lighter fs-5">
       <summary> Review details </summary>
       <div>
-        <ul>
+        <ul *ngIf="cardData['review']">
           <li><b>Last reviewed on :</b>  {{cardData['review']['lastReviewDate']}}</li>
           <li>  <b> Next review date:  </b>  {{cardData['review']['nextReviewDate']}}</li>
         </ul>
