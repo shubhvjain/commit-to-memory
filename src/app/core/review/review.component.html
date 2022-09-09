@@ -46,6 +46,17 @@
           <ul>
             <li> New Cards :  {{cards.count.new}}    <button *ngIf="cards.count.new>0" (click)="startReview('new')" type="button" class="btn btn-link"> Start review</button> </li>
             <li> Cards scheduled for today : {{cards.count.today}}  <button *ngIf="cards.count.today>0" type="button" (click)="startReview('today')"  class="btn btn-link">Start review</button> </li>
+            <li>  
+              <div class="row g-3">
+                <div class="col-auto">
+                  <label for="staticEmail2" class=""> Cards tagged</label>
+                  <input type="text"  class="form-control" id="staticEmail2"  [(ngModel)]="inputTagName" >
+                </div>
+                <div class="col-auto">
+                  <button  class="btn btn-link mb-3" (click)="startReview('tag')"> Review</button>
+                </div>
+              </div>  
+            </li>
           </ul>
         </div>
       </div>

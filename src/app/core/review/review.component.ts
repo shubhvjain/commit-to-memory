@@ -42,6 +42,7 @@ export class ReviewComponent implements OnInit {
   loadCardPreview:boolean = false
   reviewIds:any=[]
   currentIndex:number=-1
+  inputTagName:string = "";
 
   startReview(query:string='all'){
     this.reviewIds = []
@@ -56,24 +57,32 @@ export class ReviewComponent implements OnInit {
       },
       'today':()=>{
         alldt.forEach(itm=>{ if(itm['data']['reviewDateUTC']!=0){ this.reviewIds.push(itm['_id'])} })
+      },
+      'tag':(input:any)=>{
+        alldt.forEach(itm=>{  
+          if( itm['data']['tags'].includes(input.tagName)){
+            this.reviewIds.push(itm['_id'])
+          }
+         })
       }
     }
 
-    queries[query]()
-
-    this.inReview = true
-    this.loadCardPreview = true
+    queries[query]({tagName: this.inputTagName})
+    //console.log(this.reviewIds)
+    if(this.reviewIds.length>0){
+      this.inReview = true
+      this.loadCardPreview = true
+    }else{
+      alert("No cards found")
+    }
   }
 
 
   loadNextCard(){
-    console.log("loffff")
     this.loadCardPreview = false
     if(this.currentIndex < (this.reviewIds.length-1) ){
       this.currentIndex++
-
       this.loadCardPreview = true
-      // console.log('valid')
     }else{
       this.pageLoaded = false
       this.loadingMessage = " Review session done. Refresh page to see if there are new cards to review"
