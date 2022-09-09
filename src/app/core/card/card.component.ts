@@ -410,4 +410,7 @@ ${metadata.inputHelp}`
           throw error
         }    
   }
+  jsonToString(input:any){
+    return `<pre>${JSON.stringify(input,null,2)}</pre>`
+  }
 }
