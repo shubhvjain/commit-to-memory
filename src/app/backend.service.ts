@@ -22,6 +22,12 @@ export class BackendService {
     return records
   }
 
+  async loadCardsWithTag(text:string){
+    const query = {"data.tags":{"$in":text.split(",")}}
+    const records = await this.sds.searchRecord(query)
+    return records
+  }
+
   async updateMetadata(){
 
   }

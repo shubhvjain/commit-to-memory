@@ -9,16 +9,18 @@ import { CoreRoutingModule } from './core-routing.module';
 import { CoreComponent } from './core.component';
 import { NewCardComponent } from './new-card/new-card.component';
 import { ReviewComponent } from './review/review.component';
-import { CardComponent } from './card/card.component';
+// import { CardComponent } from './card/card.component';
 import { EditCardComponent } from './edit-card/edit-card.component';
 import { LoginComponent } from './login/login.component';
+
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
     CoreComponent,
     NewCardComponent,
     ReviewComponent,
-    CardComponent,
+    // CardComponent,
     EditCardComponent,
     LoginComponent
   ],
@@ -27,7 +29,8 @@ import { LoginComponent } from './login/login.component';
     MarkdownModule.forRoot(), 
     FormsModule,
     CommonModule,
-    CoreRoutingModule
+    CoreRoutingModule,
+    SharedModule,
   ]
 })
 export class CoreModule { }

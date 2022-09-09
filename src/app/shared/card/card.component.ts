@@ -286,7 +286,14 @@ ${metadata.inputHelp}`
   async loadSavedCard() {
     try {
       this.display = { title: "Edit card", action: "Save" }
-      const rData:any = await this.ds.getRecord(this.id)
+      let rData:any;
+      if(this.record){
+        console.log("data was provided")
+        rData = this.record['data']
+      }else{
+        rData = await this.ds.getRecord(this.id)
+        //console.log(rData)
+      }
       if(rData){
         this.loadSavedCardForm(rData)
         this.displayCard = true
