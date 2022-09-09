@@ -219,6 +219,33 @@
     <button type="button" class="btn mt-3 btn-lg btn-secondary fw-lighter fs-6" (click)="handleCardAction()" >
       {{ display.action }}
     </button>
+    <details class=" p-2 fw-lighter fs-5">
+      <summary> Review details </summary>
+      <div>
+        <ul>
+          <li><b>Last reviewed on :</b>  {{cardData['review']['lastReviewDate']}}</li>
+          <li>  <b> Next review date:  </b>  {{cardData['review']['nextReviewDate']}}</li>
+        </ul>
+        
+        <h5>Review history</h5>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Reviewed on </th>
+              <th scope="col">Review feedback</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let hist of cardData['reviewHistory'];let i=index">
+              <th scope="row">{{i+1}}</th>
+              <td>{{hist.reviewTime}}</td>
+              <td> <div [innerHTML]="jsonToString(hist.inputFeedback)"></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
   </div>
   <div *ngIf="mode=='review'">
     <div class="card m-1 text-bg-light border border-0 mt-4">
@@ -231,26 +258,26 @@
                   <div class="mb-3 mt-2">
                     <label
                       for="exampleFormControlTextarea1"
-                      class="form-label fw-lighter fs-5 text-muted"
+                      class="form-label fw-lighter fs-6 text-muted"
                       >{{formItem.title}}</label>
                     <textarea
                       [(ngModel)]="reviewData[formItem.title]"
-                      class="form-control fw-lighter fs-5"
+                      class="form-control fw-lighter fs-6"
                       id="exampleFormControlTextarea1"
                       rows="1"
                     ></textarea>
                   </div>
                 </ng-template>
                 <ng-template [ngIf]="formItem.type=='boolean'">
-                  <div class="form-check fw-lighter fs-5">
-                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="reviewData[formItem.title]" >
+                  <div class="form-check fw-lighter fs-6">
+                    <input class="form-check-input " type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="reviewData[formItem.title]" >
                     <label class="form-check-label" for="flexCheckChecked">
                       {{formItem.title}}
                     </label>
                   </div>
                 </ng-template>
                 <ng-template [ngIf]="formItem.type=='enum'">
-                  <div class="row  mt-2 fw-lighter fs-5">
+                  <div class="row  mt-2 fw-lighter fs-6">
                     <div class="col-lg-3 p-2">
                       {{formItem.title}}
                     </div>
@@ -267,6 +294,7 @@
           </div>
           <div class="col-lg-4 p-2">
             <button (click)="saveReview()" type="button" class="btn btn-dark  fw-lighter ">Review</button>
+            <a  class="ps-2"  target="_blank" href="/core/edit/{{id}}">Edit</a>
           </div>
         </div>
       </div>
