@@ -37,6 +37,16 @@
           ></textarea>
         </div>
       </ng-template>
+      <ng-template [ngIf]="formItem.type=='text1'">
+        <div class="mb-3 mt-2">
+          <label
+            class="form-label fw-lighter fs-5 text-muted">{{formItem.title}}:</label>
+          <input
+            type="text"
+            [(ngModel)]="cardData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5">
+        </div>
+      </ng-template>
       <ng-template [ngIf]="formItem.type=='boolean'">
         <div class="form-check fw-lighter fs-5">
           <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="cardData['content'][formItem.title]" >
@@ -152,6 +162,16 @@
             id="exampleFormControlTextarea1"
             rows="3"
           ></textarea>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='text1'">
+        <div class="mb-3 mt-2">
+          <label
+            class="form-label fw-lighter fs-5 text-muted">{{formItem.title}}:</label>
+          <input
+            type="text"
+            [(ngModel)]="cardData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5">
         </div>
       </ng-template>
       <ng-template [ngIf]="formItem.type=='boolean'">
@@ -275,7 +295,7 @@
                 <ng-template [ngIf]="formItem.type=='boolean'">
                   <div class="form-check fw-lighter fs-6">
                     <input class="form-check-input " type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="reviewData[formItem.title]" >
-                    <label class="form-check-label" for="flexCheckChecked">
+                    <label class="form-check-label  fw-lighter" for="flexCheckChecked">
                       {{formItem.title}}
                     </label>
                   </div>
@@ -291,11 +311,11 @@
                 </ng-template>
               </div>
             </div>
-            <details open>
+            <details>
               <summary  class="fs-6 fw-lighter">Edits </summary>
               <span class="m-1" *ngFor="let fl of this.metadata['options']['reviewEditTags'];let i = index">
                 <input type="checkbox" class="btn-check " id="btn-check-2-outlined-{{i}}"  autocomplete="off" [(ngModel)]="reviewData['editTags'][fl]" >
-                <label class="btn btn-outline-secondary btn-sm m-1" style="font-size:10px;" for="btn-check-2-outlined-{{i}}">{{fl}}</label>
+                <label class="btn btn-outline-secondary btn-sm m-1 p-1" style="font-size:10px;" for="btn-check-2-outlined-{{i}}">{{fl}}</label>
               </span>
             </details>
 

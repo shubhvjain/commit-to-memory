@@ -129,6 +129,7 @@ ${metadata.inputHelp}`
   validInputTypes: any = {
     "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
     "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
+    "text1": (defValue: any) => { return { default: defValue ? defValue : ""} },
     "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } },
     "tags": (defValue:any) => { return {defualt:defValue?defValue.split(","):[]} }
   }
