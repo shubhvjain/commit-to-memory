@@ -248,24 +248,28 @@
     </details>
   </div>
   <div *ngIf="mode=='review'">
-    <div class="card m-1 text-bg-light border border-0 mt-4">
-      <div class="card-body">
+    <iframe  id="cardPreviewIframe" frameborder="0" height="400px" width="100%"></iframe>
+    <div class="card m-1 text-bg-light border border-0 mt-2">
+      <div class="card-body p-2">
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-12">
             <div class="row"  *ngFor="let formItem of reviewForm"  >
               <div class="col-lg-12">
                 <ng-template [ngIf]="formItem.type=='text'">
-                  <div class="mb-3 mt-2">
-                    <label
+                  <div class="d-flex">
+                    <div class="p-2 flex-fill">
+                      <label
                       for="exampleFormControlTextarea1"
                       class="form-label fw-lighter fs-6 text-muted"
                       >{{formItem.title}}</label>
-                    <textarea
+                    </div>
+                    <div class="p-2 flex-fill">
+                      <textarea
                       [(ngModel)]="reviewData[formItem.title]"
                       class="form-control fw-lighter fs-6"
                       id="exampleFormControlTextarea1"
-                      rows="1"
-                    ></textarea>
+                      rows="1"></textarea>
+                    </div>
                   </div>
                 </ng-template>
                 <ng-template [ngIf]="formItem.type=='boolean'">
@@ -277,30 +281,34 @@
                   </div>
                 </ng-template>
                 <ng-template [ngIf]="formItem.type=='enum'">
-                  <div class="row  mt-2 fw-lighter fs-6">
-                    <div class="col-lg-3 p-2">
-                      {{formItem.title}}
-                    </div>
-                    <div class="col-lg-9">
-                      <select class="form-select  fw-lighter " [(ngModel)]="reviewData[formItem.title]" >
-                        <option value="none">Select</option>
-                        <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
-                      </select>
-                    </div>
+                  <div class="d-flex fw-lighter fs-6">
+                    <div class="p-2 flex-fill">{{formItem.title}}</div>
+                    <div class="p-2 flex-fill"><select class="form-select  fw-lighter " [(ngModel)]="reviewData[formItem.title]" >
+                      <option value="none">Select</option>
+                      <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
+                    </select></div>
                   </div>
                 </ng-template>
               </div>
             </div>
-          </div>
-          <div class="col-lg-4 p-2">
-            <button (click)="saveReview()" type="button" class="btn btn-dark  fw-lighter ">Review</button>
-            <a  class="ps-2"  target="_blank" href="/core/edit/{{id}}">Edit</a>
+            <details open>
+              <summary  class="fs-6 fw-lighter">Edits </summary>
+              <span class="m-1" *ngFor="let fl of this.metadata['options']['reviewEditTags'];let i = index">
+                <input type="checkbox" class="btn-check " id="btn-check-2-outlined-{{i}}"  autocomplete="off" [(ngModel)]="reviewData['editTags'][fl]" >
+                <label class="btn btn-outline-secondary btn-sm m-1" style="font-size:10px;" for="btn-check-2-outlined-{{i}}">{{fl}}</label>
+              </span>
+            </details>
+
+            <div class="pt-2 mt-2 ">
+              <button (click)="saveReview()" type="button" class="btn btn-dark  fw-lighter ">Review</button>
+              <a  class="ps-2"  target="_blank" href="/core/edit/{{id}}">Edit</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- <button (click)="loadCardPreview()">load</button> -->
-    <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>
+
   </div>
   <div *ngIf="mode=='preview'">
        <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>

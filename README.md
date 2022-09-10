@@ -11,7 +11,8 @@ When the app loads, only the app module is loaded.
 The main module is the home page where links other pages are displayed.
 Modules are lazy-loaded when the user navigates from the home page.
 
-There are 3  main modules in the project:
+There are 4  main modules in the project:
+- `shared` : the main thing in this shared module is the card component 
 - `core` : this has the main functionality: creating flashcards and reviewing them 
 - `settings`: all user configurable settings. like flashcard types, review systems
 - `plugins`: additional features. like statistics, searching flashcards, creating quizzes 

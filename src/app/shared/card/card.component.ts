@@ -235,7 +235,7 @@ ${metadata.inputHelp}`
   async loadCardPreview() {
     const meta = this.getCardTypeMetadata()
     const preview = this.generateFlashcardView(meta,this.cardData['content'],{iframeName:this.previewIframeName})
-    if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
+    // if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
 
     const ifr:any = document.getElementById("cardPreviewIframe")
         if (ifr) {
@@ -348,12 +348,36 @@ ${metadata.inputHelp}`
     return cardMetadata
   }
 
+  getEditTagsObjectForReview(){
+    let allEditTags:[any] = this.metadata['options']['reviewEditTags']
+    let initalEditFlags:any = {}
+    allEditTags.map(flag=>{ initalEditFlags[flag] = false })
+    return initalEditFlags
+  }
+
+  convertEditTagObjectToTags(editObj:any){
+    let allEditTags:[any] = this.metadata['options']['reviewEditTags']
+    let tags:any = []
+    allEditTags.map(flag=>{ if(editObj[flag]){tags.push(`review-${flag}`)}})
+    return tags
+  }
+
+
   async loadCardReview(){
     // get review algorithm metadata feedbackInput
     const alg:any = this.getReviewAlgorithmData()
-    const rd = this.convertInputToFormData(alg['feedbackInput'])
+    let fbInputs = alg['feedbackInput']
+    if(!fbInputs.includes("note:text")){
+      fbInputs.push("note:text")
+    }
+
+    const rd = this.convertInputToFormData(fbInputs)
+    // defualt fields
+    rd['data']['editTags'] = this.getEditTagsObjectForReview()
+
     this.reviewForm = rd.formData
     this.reviewData = rd.data
+    // console.log(this.reviewData)
     const ang = this
     setTimeout(async function(){
       await ang.loadCardPreview()
@@ -387,6 +411,14 @@ ${metadata.inputHelp}`
     const reqFields = ['reviewDateUTC','review','history']
     reqFields.map(i=>{if(!data[i]){throw 'Validation error' }})
   }
+  updateTagsAfterReview(reviewData:any){
+    const newTags:[any] = this.convertEditTagObjectToTags(reviewData['editTags'])
+    newTags.map(tag=>{ 
+      if(!this.cardData['tags'].includes(tag)){
+        this.cardData['tags'].push(tag)
+      }
+    })
+  }
 
   async processReview() {
         // get the review function
@@ -404,16 +436,19 @@ ${metadata.inputHelp}`
           const reviewedData = reviewMethod()
           this.validateReviewedData(reviewedData)
           this.cardData['reviewHistory'].push(reviewedData['history'])
+          this.updateTagsAfterReview(this.reviewData)
           const dataToSave = {
-            review : JSON.parse(JSON.stringify(this.combineCardData(this.cardData['review'],reviewedData['review']))),
+            review : JSON.parse(JSON.stringify(this.combineCardData({},reviewedData['review']))),
             reviewHistory: this.cardData['reviewHistory'],
-            reviewDateUTC: reviewedData['reviewDateUTC']
+            reviewDateUTC: reviewedData['reviewDateUTC'],
+            tags: this.cardData['tags']
           }
           console.log(dataToSave)
           const result = await this.ds.updateRecord(this.id,dataToSave)
           // save the review results   
         } catch (error) {
           console.log(error)
+          alert("Error in saving review")
           throw error
         }    
   }
