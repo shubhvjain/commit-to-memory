@@ -412,9 +412,8 @@ ${metadata.inputHelp}`
     const reqFields = ['reviewDateUTC','review','history']
     reqFields.map(i=>{if(!data[i]){throw 'Validation error' }})
   }
-  updateTagsAfterReview(reviewData:any){
-    const newTags:[any] = this.convertEditTagObjectToTags(reviewData['editTags'])
-    newTags.map(tag=>{ 
+  updateTagsAfterReview(allTags:[any]){
+    allTags.map(tag=>{ 
       if(!this.cardData['tags'].includes(tag)){
         this.cardData['tags'].push(tag)
       }
@@ -434,12 +433,17 @@ ${metadata.inputHelp}`
         // run the review function 
         try {
           const reviewMethod = new Function(fullSrcipt);
-          const reviewedData = reviewMethod()
+          let reviewedData = reviewMethod()
           this.validateReviewedData(reviewedData)
+
+          const newTags:[any] = this.convertEditTagObjectToTags(reviewedData['history']['inputFeedback']['editTags'])
+          const atg:any = [...newTags,...reviewedData['history']['suggestedTags']]
+          this.updateTagsAfterReview(atg)
+          reviewedData['history']['inputFeedback']['editTags'] = newTags
+
           this.cardData['reviewHistory'].push(reviewedData['history'])
-          this.updateTagsAfterReview(this.reviewData)
           const dataToSave = {
-            review : JSON.parse(JSON.stringify(this.combineCardData({},reviewedData['review']))),
+            review : reviewedData['review'],
             reviewHistory: this.cardData['reviewHistory'],
             reviewDateUTC: reviewedData['reviewDateUTC'],
             tags: this.cardData['tags']
