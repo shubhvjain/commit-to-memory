@@ -232,6 +232,12 @@ ${metadata.inputHelp}`
   }
 
   previewIframeName="cardPreviewIframe"
+  
+  getCurrentTimeUtc(){
+    return Math.floor(new Date().getTime() / 1000)
+  }
+  
+  previewLoadTime:any
 
   async loadCardPreview() {
     const meta = this.getCardTypeMetadata()
@@ -244,8 +250,8 @@ ${metadata.inputHelp}`
           code.open();
           code.write(preview);
           code.close();
+          this.previewLoadTime = this.getCurrentTimeUtc()
         }
-    
   }
 
   resetAfterInsertNew(){
@@ -440,6 +446,12 @@ ${metadata.inputHelp}`
           const atg:any = [...newTags,...reviewedData['history']['suggestedTags']]
           this.updateTagsAfterReview(atg)
           reviewedData['history']['inputFeedback']['editTags'] = newTags
+
+
+          // track time taken to review
+          const rightnow = this.getCurrentTimeUtc()
+          const diff = rightnow - this.previewLoadTime
+          reviewedData['history']['inputFeedback']['timeTakenSec'] = diff
 
           this.cardData['reviewHistory'].push(reviewedData['history'])
           const dataToSave = {
