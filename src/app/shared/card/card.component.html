@@ -268,7 +268,7 @@
     </details>
   </div>
   <div *ngIf="mode=='review'">
-    <iframe  id="cardPreviewIframe" frameborder="0" height="400px" width="100%"></iframe>
+    <iframe  [id]="previewIframeName" frameborder="0" height="400px" width="100%"></iframe>
     <div class="card m-1 text-bg-light border border-0 mt-2">
       <div class="card-body p-2">
         <div class="row">
@@ -331,7 +331,7 @@
 
   </div>
   <div *ngIf="mode=='preview'">
-       <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>
+       <iframe  [id]="previewIframeName" frameborder="0" height="500px" width="100%"></iframe>
   </div>
 </div>
 <div *ngIf="!displayCard">Loading...</div>

@@ -30,10 +30,9 @@
       </nav>
     </div>
   </div>
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-lg-8 mx-auto">
       <div *ngIf="results.length>0" >
-        <h5>Found {{results.length}} cards. Showing card {{current+1}}</h5>
         <div>
           <button (click)="back()" type="button" class="btn btn-sm btn-light fw-lighter">Previous</button>
           <button (click)="next()" type="button" class="ms-2 btn-sm btn btn-light fw-lighter">Next</button>
@@ -44,6 +43,17 @@
         <flash-card [metadata]="metadata" [mode]="'preview'" [id]="results[current]['_id']" [record]="results[current]" ></flash-card>
         <hr>
         <a href="/core/edit/{{results[current]['_id']}}" target="_blank" rel="noopener noreferrer"> Edit</a>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="row mt-2">
+    <div class="col-lg-8 mx-auto">
+      <h5>Found {{results.length}} cards.</h5>
+      <div *ngFor="let a of results;let i = index">
+        <flash-card [metadata]="metadata" [mode]="'preview'" [id]="a['_id']" [record]="a" ></flash-card>
+        <hr>
+        <a href="/core/edit/{{a['_id']}}" target="_blank" rel="noopener noreferrer"> Edit</a>
       </div>
     </div>
   </div>

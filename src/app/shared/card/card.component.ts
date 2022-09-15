@@ -22,6 +22,12 @@ export class CardComponent implements OnInit {
     this.display = { title: "New flashcard", action: "Add New" }
     this.mode = "new"
     this.initialRelation = ""
+    this.setRandomId()
+
+  }
+  setRandomId(){
+    this.previewIframeName = "previewIframe-"+Math.floor(Math.random() * (10000) + 1)
+    console.log(this.previewIframeName)
   }
   ngOnInit(): void {
     //console.log()
@@ -244,7 +250,7 @@ ${metadata.inputHelp}`
     const preview = this.generateFlashcardView(meta,this.cardData['content'],{iframeName:this.previewIframeName})
     // if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
 
-    const ifr:any = document.getElementById("cardPreviewIframe")
+    const ifr:any = document.getElementById(this.previewIframeName)
         if (ifr) {
           var code = ifr['contentWindow'].document;
           code.open();
