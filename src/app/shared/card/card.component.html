@@ -241,7 +241,7 @@
     </button>
     <details class=" p-2 fw-lighter fs-5">
       <summary> Review details </summary>
-      <div>
+      <div style="display:none;">
         <ul *ngIf="cardData['review']">
           <li><b>Last reviewed on :</b>  {{cardData['review']['lastReviewDate']}}</li>
           <li>  <b> Next review date:  </b>  {{cardData['review']['nextReviewDate']}}</li>
@@ -264,6 +264,13 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div>
+        Review data
+        <h6>History</h6>
+        <pre>{{cardData['reviewHistory']|json}}</pre>
+        <h6>Review</h6>
+        <pre>{{cardData['review']|json}}</pre>
       </div>
     </details>
   </div>
