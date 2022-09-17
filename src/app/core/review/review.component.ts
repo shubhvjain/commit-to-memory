@@ -59,6 +59,7 @@ export class ReviewComponent implements OnInit {
         this.cardTags[tagVal] += 1
       })
     })
+    this.cardTagArray = this.cardTagArray.sort()
   }
 
   loadTag(tagName:any){
