@@ -56,6 +56,7 @@
           <tr *ngFor="let card of results" >
             <td>{{card['data']['cardType']}}</td>
             <td>
+              <span class="badge text-bg-light fw-lighter m-1">Id: {{card['_id']}}</span>
               <span *ngFor="let tag of card['data']['tags']" class="badge text-bg-secondary fw-lighter m-1">{{tag}}</span> 
             </td>
             <td>
@@ -87,7 +88,7 @@
 <ngx-smart-modal #editCard identifier="editCard">
   <h4>Edit</h4>
   <hr>
-  <iframe width="100%" height="550px" *ngIf="showEdit" [src]="'/core/edit/'+editId |safeThing: 'resourceUrl'" frameborder="0"></iframe>
+  <iframe width="100%" height="550px" *ngIf="showEdit" [src]="'/core/edit/'+editId+'?iframeMode=true' |safeThing: 'resourceUrl'" frameborder="0"></iframe>
 
 
   <!-- <button class="btn btn-sm btn-outline-dark" (click)="editCard.close()">Close</button> -->
@@ -97,6 +98,7 @@
 <ngx-smart-modal #previewCard identifier="previewCard">
   <h4>Preview</h4>
   <hr>
+  <iframe width="100%" height="550px" *ngIf="showPreview" [src]="'/core/preview/'+preivewId+'?iframeMode=true'|safeThing: 'resourceUrl'" frameborder="0"></iframe>
 
   <!-- <button class="btn btn-sm btn-outline-dark" (click)="previewCard.close()">Close</button> -->
 </ngx-smart-modal>

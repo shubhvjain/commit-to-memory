@@ -10,7 +10,7 @@ import { QuizComponent } from './quiz/quiz.component';
 const routes: Routes = [
   { path: 'stats', component: StatsComponent },
   { path: 'search', component: SearchComponent },
-  { path: 'quiz', component: QuizComponent }
+  { path: 'explore', component: QuizComponent }
 ];
 
 @NgModule({

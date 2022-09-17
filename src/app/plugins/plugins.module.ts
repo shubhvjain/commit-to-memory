@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { SharedModule } from '../shared/shared.module';
+
 import { NgxSmartModalModule } from 'ngx-smart-modal';
 import { PluginsRoutingModule } from './plugins-routing.module';
 import { PluginsComponent } from './plugins.component';
@@ -22,7 +24,8 @@ import { SafeThingPipe } from '../safe-thing.pipe';
     CommonModule,
     PluginsRoutingModule,
     FormsModule,
-    NgxSmartModalModule.forRoot()
+    NgxSmartModalModule.forRoot(),
+    SharedModule
   ]
 })
 export class PluginsModule { }

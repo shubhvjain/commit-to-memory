@@ -22,6 +22,12 @@ export class BackendService {
     return records
   }
 
+  async loadCardsWithTag(text:string){
+    const query = {"data.tags":{"$in":text.split(",")}}
+    const records = await this.sds.searchRecord(query)
+    return records
+  }
+
   async updateMetadata(){
 
   }
@@ -87,7 +93,7 @@ export class BackendService {
     const requestData = { data:fullData.data,  structure: "flashcard", metadata: meta }
     this.validateNewRecord(requestData)
     const newRecord:any = await this.sds.newRecord(requestData)
-    return { type:'success', message: ` Card created. <a href="/core/edit/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Edit</a>`}
+    return { type:'success', message: ` Card created. <a href="/core/edit/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Edit</a> , <a href="/core/preview/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Preview</a>`}
   }
 
   async reviewList(){

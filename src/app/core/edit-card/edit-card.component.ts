@@ -14,11 +14,19 @@ export class EditCardComponent implements OnInit {
   displayPage:boolean = false;
   metadata:any
   id:any;
+  mode:any;
+  iframeMode:boolean = false
   ngOnInit(): void {
     
     this._Activatedroute.paramMap.subscribe(params => { 
       //console.log(params);
       this.id = params.get('id'); 
+      this.mode = params.get('mode');
+
+      this._Activatedroute.queryParams.subscribe(params=>{
+        this.iframeMode = params['iframeMode']=='true'
+      })
+
       this.loadPage()      
    });
   }

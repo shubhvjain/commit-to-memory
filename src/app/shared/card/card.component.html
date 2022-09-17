@@ -17,19 +17,34 @@
       </div>
     </nav>
 
+    <details class="fw-lighter">
+      <summary>Help</summary>
+      <div class="fw-lighter" [innerHTML]="cardHelp | markdown"></div>
+    </details>
+
     <div *ngFor="let formItem of formData" >
       <ng-template [ngIf]="formItem.type=='text'">
         <div class="mb-3 mt-2">
           <label
             for="exampleFormControlTextarea1"
             class="form-label fw-lighter fs-5 text-muted"
-            >{{formItem.title}}</label>
+            >{{formItem.title}}:</label>
           <textarea
             [(ngModel)]="cardData['content'][formItem.title]"
             class="form-control fw-lighter fs-5"
             id="exampleFormControlTextarea1"
             rows="3"
           ></textarea>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='text1'">
+        <div class="mb-3 mt-2">
+          <label
+            class="form-label fw-lighter fs-5 text-muted">{{formItem.title}}:</label>
+          <input
+            type="text"
+            [(ngModel)]="cardData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5">
         </div>
       </ng-template>
       <ng-template [ngIf]="formItem.type=='boolean'">
@@ -53,6 +68,16 @@
           </div>
         </div>
       </ng-template>
+      <ng-template [ngIf]="formItem.type=='tags'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="cardData['content'][formItem.title]"></tag-input>
+          </div>
+        </div>
+      </ng-template>      
     </div>
 
     <div class="card  text-bg-light border border-0 mt-4">
@@ -119,19 +144,34 @@
       </div>
     </nav>
 
+    <details class="fw-lighter">
+      <summary>Help</summary>
+      <div class="fw-lighter" [innerHTML]="cardHelp | markdown"></div>
+    </details>
+
     <div *ngFor="let formItem of formData" >
       <ng-template [ngIf]="formItem.type=='text'">
         <div class="mb-3 mt-2">
           <label
             for="exampleFormControlTextarea1"
             class="form-label fw-lighter fs-5 text-muted"
-            >{{formItem.title}}</label>
+            >{{formItem.title}}:</label>
           <textarea
             [(ngModel)]="cardData['content'][formItem.title]"
             class="form-control fw-lighter fs-5"
             id="exampleFormControlTextarea1"
             rows="3"
           ></textarea>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='text1'">
+        <div class="mb-3 mt-2">
+          <label
+            class="form-label fw-lighter fs-5 text-muted">{{formItem.title}}:</label>
+          <input
+            type="text"
+            [(ngModel)]="cardData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5">
         </div>
       </ng-template>
       <ng-template [ngIf]="formItem.type=='boolean'">
@@ -155,6 +195,16 @@
           </div>
         </div>
       </ng-template>
+      <ng-template [ngIf]="formItem.type=='tags'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="cardData['content'][formItem.title]"></tag-input>
+          </div>
+        </div>
+      </ng-template>  
     </div>
     <div class="card  text-bg-light border border-0 mt-4">
       <div class="card-body">
@@ -189,60 +239,114 @@
     <button type="button" class="btn mt-3 btn-lg btn-secondary fw-lighter fs-6" (click)="handleCardAction()" >
       {{ display.action }}
     </button>
+    <details class=" p-2 fw-lighter fs-5">
+      <summary> Review details </summary>
+      <div style="display:none;">
+        <ul *ngIf="cardData['review']">
+          <li><b>Last reviewed on :</b>  {{cardData['review']['lastReviewDate']}}</li>
+          <li>  <b> Next review date:  </b>  {{cardData['review']['nextReviewDate']}}</li>
+        </ul>
+        
+        <h5>Review history</h5>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Reviewed on </th>
+              <th scope="col">Review feedback</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let hist of cardData['reviewHistory'];let i=index">
+              <th scope="row">{{i+1}}</th>
+              <td>{{hist.reviewTime}}</td>
+              <td> <div [innerHTML]="jsonToString(hist.inputFeedback)"></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        Review data
+        <h6>History</h6>
+        <pre>{{cardData['reviewHistory']|json}}</pre>
+        <h6>Review</h6>
+        <pre>{{cardData['review']|json}}</pre>
+      </div>
+    </details>
+    <details  class=" p-2 fw-lighter fs-5">
+      <summary>Preview</summary>
+
+      <button class="btn btn-sm btn-light" (click)="loadCardPreview()" >Show preview</button>
+      <iframe  [id]="previewIframeName" frameborder="0" height="500px" width="100%"></iframe>
+      
+
+    </details>
   </div>
   <div *ngIf="mode=='review'">
-    <div class="card m-1 text-bg-light border border-0 mt-4">
-      <div class="card-body">
+    <iframe  [id]="previewIframeName" frameborder="0" height="400px" width="100%"></iframe>
+    <div class="card m-1 text-bg-light border border-0 mt-2">
+      <div class="card-body p-2">
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-12">
             <div class="row"  *ngFor="let formItem of reviewForm"  >
               <div class="col-lg-12">
                 <ng-template [ngIf]="formItem.type=='text'">
-                  <div class="mb-3 mt-2">
-                    <label
+                  <div class="d-flex">
+                    <div class="p-2 flex-fill">
+                      <label
                       for="exampleFormControlTextarea1"
-                      class="form-label fw-lighter fs-5 text-muted"
+                      class="form-label fw-lighter fs-6 text-muted"
                       >{{formItem.title}}</label>
-                    <textarea
+                    </div>
+                    <div class="p-2 flex-fill">
+                      <textarea
                       [(ngModel)]="reviewData[formItem.title]"
-                      class="form-control fw-lighter fs-5"
+                      class="form-control fw-lighter fs-6"
                       id="exampleFormControlTextarea1"
-                      rows="3"
-                    ></textarea>
+                      rows="1"></textarea>
+                    </div>
                   </div>
                 </ng-template>
                 <ng-template [ngIf]="formItem.type=='boolean'">
-                  <div class="form-check fw-lighter fs-5">
-                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="reviewData[formItem.title]" >
-                    <label class="form-check-label" for="flexCheckChecked">
+                  <div class="form-check fw-lighter fs-6">
+                    <input class="form-check-input " type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="reviewData[formItem.title]" >
+                    <label class="form-check-label  fw-lighter" for="flexCheckChecked">
                       {{formItem.title}}
                     </label>
                   </div>
                 </ng-template>
                 <ng-template [ngIf]="formItem.type=='enum'">
-                  <div class="row  mt-2 fw-lighter fs-5">
-                    <div class="col-lg-3 p-2">
-                      {{formItem.title}}
-                    </div>
-                    <div class="col-lg-9">
-                      <select class="form-select  fw-lighter " [(ngModel)]="reviewData[formItem.title]" >
-                        <option value="none">Select</option>
-                        <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
-                      </select>
-                    </div>
+                  <div class="d-flex fw-lighter fs-6">
+                    <div class="p-2 flex-fill">{{formItem.title}}</div>
+                    <div class="p-2 flex-fill"><select class="form-select  fw-lighter " [(ngModel)]="reviewData[formItem.title]" >
+                      <option value="none">Select</option>
+                      <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
+                    </select></div>
                   </div>
                 </ng-template>
               </div>
             </div>
-          </div>
-          <div class="col-lg-4 p-2">
-            <button (click)="saveReview()" type="button" class="btn btn-dark  fw-lighter ">Review</button>
+            <details>
+              <summary  class="fs-6 fw-lighter">Edits </summary>
+              <span class="m-1" *ngFor="let fl of this.metadata['options']['reviewEditTags'];let i = index">
+                <input type="checkbox" class="btn-check " id="btn-check-2-outlined-{{i}}"  autocomplete="off" [(ngModel)]="reviewData['editTags'][fl]" >
+                <label class="btn btn-outline-secondary btn-sm m-1 p-1" style="font-size:10px;" for="btn-check-2-outlined-{{i}}">{{fl}}</label>
+              </span>
+            </details>
+
+            <div class="pt-2 mt-2 ">
+              <button (click)="saveReview()" type="button" class="btn btn-dark  fw-lighter ">Review</button>
+              <a  class="ps-2"  target="_blank" href="/core/edit/{{id}}">Edit</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <!-- <button (click)="loadCardPreview()">load</button> -->
-    <iframe  id="cardPreviewIframe" frameborder="0" height="500px" width="100%"></iframe>
+
+  </div>
+  <div *ngIf="mode=='preview'">
+       <iframe  [id]="previewIframeName" frameborder="0" height="500px" width="100%"></iframe>
   </div>
 </div>
 <div *ngIf="!displayCard">Loading...</div>

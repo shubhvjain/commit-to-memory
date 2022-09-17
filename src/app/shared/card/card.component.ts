@@ -22,6 +22,12 @@ export class CardComponent implements OnInit {
     this.display = { title: "New flashcard", action: "Add New" }
     this.mode = "new"
     this.initialRelation = ""
+    this.setRandomId()
+
+  }
+  setRandomId(){
+    this.previewIframeName = "previewIframe-"+Math.floor(Math.random() * (10000) + 1)
+    console.log(this.previewIframeName)
   }
   ngOnInit(): void {
     //console.log()
@@ -39,7 +45,7 @@ export class CardComponent implements OnInit {
     if (!this.metadata) {
       this.metadata = await this.ds.getMetadata()
     }
-    console.log(this.metadata)
+    //console.log(this.metadata)
     //mode = new
     if (this.mode == 'new') {
       this.loadNewCard()
@@ -48,7 +54,11 @@ export class CardComponent implements OnInit {
       await this.loadSavedCard()
       
       if (this.mode == 'preview') {
-        await this.loadCardPreview()
+        const ang = this
+        setTimeout(async function(){
+          await ang.loadCardPreview()
+        },100)
+        
       }
       if (this.mode == 'review'){
         await this.loadCardReview()
@@ -78,11 +88,24 @@ export class CardComponent implements OnInit {
     return cardMetadata
   }
 
+  cardHelp=""
+  updateCardHelp(metadata:any){
+    //console.log(metadata)
+    if(metadata){
+      this.cardHelp = `**How to use this card?** 
+${metadata.displayHelp}
+${metadata.inputHelp}`
+    }else{
+      this.cardHelp = ""
+    }
+  }
+
   changeNewCardType(newCardType: Event) {
     this.formData = []
     let dt: any = newCardType.target
     const cardTypes: [any] = this.metadata['cardTypes']
     const cardMetadata = cardTypes.find(itm => { return itm['name'] == dt['value'] })
+    this.updateCardHelp(cardMetadata)
     if (cardMetadata) {
       const newData = this.createFormDataFromCardMetadata(cardMetadata)
       this.formData = newData['formData']
@@ -112,7 +135,9 @@ export class CardComponent implements OnInit {
   validInputTypes: any = {
     "boolean": (defValue: any) => { return {  default: defValue ? defValue == 'true' : false} },
     "text": (defValue: any) => { return { default: defValue ? defValue : ""} },
-    "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } }
+    "text1": (defValue: any) => { return { default: defValue ? defValue : ""} },
+    "enum": (defValue:any) => { return  {default : "none" , items : defValue.split(",") } },
+    "tags": (defValue:any) => { return {defualt:defValue?defValue.split(","):[]} }
   }
 
   convertInputToFormData(inputs:[string]){
@@ -152,7 +177,19 @@ export class CardComponent implements OnInit {
     const dataInput = fcData;
     let defHTML = ` 
         <script src="${serverConfig.staticFilesUrl}/scripts/codescripts.js"> </script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script>
+        MathJax.Hub.Config({
+          showMathMenu: true,
+          tex2jax: { inlineMath: [["$", "$"]],displayMath:[["$$", "$$"]] },
+          menuSettings: { zoom: "Double-Click", zscale: "150%" },
+          CommonHTML: { linebreaks: { automatic: true } },
+          "HTML-CSS": { linebreaks: { automatic: true } },
+          SVG: { linebreaks: { automatic: true } }
+        });
+      </script>
         <div id='result'></div>  `;
     let jsPart = `  
         <script type='text/javascript'> 
@@ -183,7 +220,12 @@ export class CardComponent implements OnInit {
             })
         }
         function loadCSS(file){var fileref = document.createElement("link");fileref.rel = "stylesheet";fileref.type = "text/css";fileref.href = file;document.getElementsByTagName("head")[0].appendChild(fileref);}
-
+        function mdToHTML(text){
+          return marked.parse(text)
+        }
+        function renderMaths(){
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub])
+        }
         const reviewData = {
           input: ${JSON.stringify(dataInput)},
           cardTypeMetadata:  ${JSON.stringify(cardTypeMetaData)}
@@ -196,21 +238,26 @@ export class CardComponent implements OnInit {
   }
 
   previewIframeName="cardPreviewIframe"
+  
+  getCurrentTimeUtc(){
+    return Math.floor(new Date().getTime() / 1000)
+  }
+  
+  previewLoadTime:any
 
   async loadCardPreview() {
-    //console.log("sampe")
     const meta = this.getCardTypeMetadata()
     const preview = this.generateFlashcardView(meta,this.cardData['content'],{iframeName:this.previewIframeName})
-    if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
+    // if(!this.displayCard){console.log(1);setTimeout(()=>{console.log("...done waiting")},75)}
 
-    const ifr:any = document.getElementById("cardPreviewIframe")
+    const ifr:any = document.getElementById(this.previewIframeName)
         if (ifr) {
           var code = ifr['contentWindow'].document;
           code.open();
           code.write(preview);
           code.close();
+          this.previewLoadTime = this.getCurrentTimeUtc()
         }
-    
   }
 
   resetAfterInsertNew(){
@@ -232,6 +279,7 @@ export class CardComponent implements OnInit {
     let dt: any = savedData['cardType']
     const cardTypes: [any] = this.metadata['cardTypes']
     const cardMetadata = cardTypes.find(itm => { return itm['name'] == dt })
+    this.updateCardHelp(cardMetadata)
     if (cardMetadata) {
       this.cardData = savedData
       const newData = this.createFormDataFromCardMetadata(cardMetadata)
@@ -251,7 +299,14 @@ export class CardComponent implements OnInit {
   async loadSavedCard() {
     try {
       this.display = { title: "Edit card", action: "Save" }
-      const rData:any = await this.ds.getRecord(this.id)
+      let rData:any;
+      if(this.record){
+        console.log("data was provided")
+        rData = this.record['data']
+      }else{
+        rData = await this.ds.getRecord(this.id)
+        //console.log(rData)
+      }
       if(rData){
         this.loadSavedCardForm(rData)
         this.displayCard = true
@@ -306,16 +361,40 @@ export class CardComponent implements OnInit {
     return cardMetadata
   }
 
+  getEditTagsObjectForReview(){
+    let allEditTags:[any] = this.metadata['options']['reviewEditTags']
+    let initalEditFlags:any = {}
+    allEditTags.map(flag=>{ initalEditFlags[flag] = false })
+    return initalEditFlags
+  }
+
+  convertEditTagObjectToTags(editObj:any){
+    let allEditTags:[any] = this.metadata['options']['reviewEditTags']
+    let tags:any = []
+    allEditTags.map(flag=>{ if(editObj[flag]){tags.push(`review-${flag}`)}})
+    return tags
+  }
+
+
   async loadCardReview(){
     // get review algorithm metadata feedbackInput
     const alg:any = this.getReviewAlgorithmData()
-    const rd = this.convertInputToFormData(alg['feedbackInput'])
+    let fbInputs = alg['feedbackInput']
+    if(!fbInputs.includes("note:text")){
+      fbInputs.push("note:text")
+    }
+
+    const rd = this.convertInputToFormData(fbInputs)
+    // defualt fields
+    rd['data']['editTags'] = this.getEditTagsObjectForReview()
+
     this.reviewForm = rd.formData
     this.reviewData = rd.data
+    // console.log(this.reviewData)
     const ang = this
     setTimeout(async function(){
       await ang.loadCardPreview()
-    },200)
+    },100)
   }
 
   async saveReview() {
@@ -345,6 +424,13 @@ export class CardComponent implements OnInit {
     const reqFields = ['reviewDateUTC','review','history']
     reqFields.map(i=>{if(!data[i]){throw 'Validation error' }})
   }
+  updateTagsAfterReview(allTags:[any]){
+    allTags.map(tag=>{ 
+      if(!this.cardData['tags'].includes(tag)){
+        this.cardData['tags'].push(tag)
+      }
+    })
+  }
 
   async processReview() {
         // get the review function
@@ -359,20 +445,37 @@ export class CardComponent implements OnInit {
         // run the review function 
         try {
           const reviewMethod = new Function(fullSrcipt);
-          const reviewedData = reviewMethod()
+          let reviewedData = reviewMethod()
           this.validateReviewedData(reviewedData)
+
+          const newTags:[any] = this.convertEditTagObjectToTags(reviewedData['history']['inputFeedback']['editTags'])
+          const atg:any = [...newTags,...reviewedData['history']['suggestedTags']]
+          this.updateTagsAfterReview(atg)
+          reviewedData['history']['inputFeedback']['editTags'] = newTags
+
+
+          // track time taken to review
+          const rightnow = this.getCurrentTimeUtc()
+          const diff = rightnow - this.previewLoadTime
+          reviewedData['history']['inputFeedback']['timeTakenSec'] = diff
+
           this.cardData['reviewHistory'].push(reviewedData['history'])
           const dataToSave = {
-            review : JSON.parse(JSON.stringify(this.combineCardData(this.cardData['review'],reviewedData['review']))),
+            review : reviewedData['review'],
             reviewHistory: this.cardData['reviewHistory'],
-            reviewDateUTC: reviewedData['reviewDateUTC']
+            reviewDateUTC: reviewedData['reviewDateUTC'],
+            tags: this.cardData['tags']
           }
           console.log(dataToSave)
           const result = await this.ds.updateRecord(this.id,dataToSave)
           // save the review results   
         } catch (error) {
           console.log(error)
+          alert("Error in saving review")
           throw error
         }    
+  }
+  jsonToString(input:any){
+    return `<pre>${JSON.stringify(input,null,2)}</pre>`
   }
 }
