@@ -343,7 +343,16 @@
       </div>
     </div>
     <!-- <button (click)="loadCardPreview()">load</button> -->
-
+    <details class=" p-2 fw-lighter fs-5">
+      <summary> Review details </summary>
+      <div style="font-size:15px;">
+        Review data
+        <h6>History</h6>
+        <pre>{{cardData['reviewHistory']|json}}</pre>
+        <h6>Review</h6>
+        <pre>{{cardData['review']|json}}</pre>
+      </div>
+    </details>
   </div>
   <div *ngIf="mode=='preview'">
        <iframe  [id]="previewIframeName" frameborder="0" height="500px" width="100%"></iframe>
