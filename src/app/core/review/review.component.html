@@ -58,6 +58,13 @@
                 </div>
               </div>  
             </li>
+            <details>
+              <summary>More filters</summary>
+              Tags: 
+              <span *ngFor="let tag of cardTagArray" class="m-1">
+                <button class="btn btn-sm btn-link" (click)="loadTag(tag)" > {{tag}} ({{cardTags[tag]}} cards)   </button>
+              </span>
+            </details>
           </ul>
         </div>
       </div>

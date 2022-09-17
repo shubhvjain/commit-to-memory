@@ -30,6 +30,7 @@ export class ReviewComponent implements OnInit {
       if(list.records.length>0){
         this.pageLoaded = true
         this.cards =  list
+        this.computeStats()
       } else{
         this.loadingMessage = "No cards to review as of yet. Refresh page or check back later."
         this.pageLoaded = false
@@ -44,6 +45,27 @@ export class ReviewComponent implements OnInit {
   currentIndex:number=-1
   inputTagName:string = "";
 
+  cardTags:any = {}
+  cardTagArray:string[] = []
+  computeStats(){
+    const list:any[] = this.cards['records']
+    list.map(itm=>{
+      const tgs:any[] = itm['data']['tags']
+      tgs.map(tagVal=>{
+        if(!this.cardTags[tagVal]){
+          this.cardTags[tagVal] = 0
+          this.cardTagArray.push(tagVal)
+        }
+        this.cardTags[tagVal] += 1
+      })
+    })
+  }
+
+  loadTag(tagName:any){
+    this.inputTagName = tagName
+    this.startReview('tag')
+  }
+  
   startReview(query:string='all'){
     this.reviewIds = []
     this.currentIndex = 0
@@ -66,7 +88,6 @@ export class ReviewComponent implements OnInit {
          })
       }
     }
-
     queries[query]({tagName: this.inputTagName})
     //console.log(this.reviewIds)
     if(this.reviewIds.length>0){
@@ -76,7 +97,6 @@ export class ReviewComponent implements OnInit {
       alert("No cards found")
     }
   }
-
 
   loadNextCard(){
     this.loadCardPreview = false
@@ -93,5 +113,4 @@ export class ReviewComponent implements OnInit {
     console.log(data)
     this.loadNextCard()
   }
-
 }
