@@ -24,7 +24,12 @@
   </div>
 </div>
 <div class="row mt-2" *ngIf="displayPage">
-  <div class="col-lg-6 mx-auto"> 
-    <flash-card [metadata]="metadata" [mode]="mode" [id]="id"></flash-card>
+  <div class="col-lg-6 mx-auto">
+    <ng-template [ngIf]="recordType=='flashcard'">
+      <flash-card [metadata]="metadata.flashcard" [mode]="mode" [id]="id" [record]="recordData"></flash-card>
+    </ng-template> 
+    <ng-template [ngIf]="recordType=='question'">
+      <question [metadata]="metadata.question" [mode]="mode" [id]="id" [record]="recordData"></question>
+    </ng-template> 
   </div>
 </div>

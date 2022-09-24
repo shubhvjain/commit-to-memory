@@ -19,7 +19,7 @@ export class CardComponent implements OnInit {
   displayCard: boolean = false;
 
   constructor(public ds: BackendService) {
-    this.display = { title: "New flashcard", action: "Add New" }
+    this.display = { title: "New Flashcard", action: "Add New" }
     this.mode = "new"
     this.initialRelation = ""
     this.setRandomId()
@@ -43,7 +43,8 @@ export class CardComponent implements OnInit {
   async loadCard() {
     this.displayCard = false;
     if (!this.metadata) {
-      this.metadata = await this.ds.getMetadata()
+      const mdata = await this.ds.getMetadata()
+      this.metadata = mdata.flashcard
     }
     //console.log(this.metadata)
     //mode = new
@@ -298,10 +299,11 @@ ${metadata.inputHelp}`
 
   async loadSavedCard() {
     try {
-      this.display = { title: "Edit card", action: "Save" }
+      this.display = { title: "Edit Flashcard", action: "Save" }
       let rData:any;
       if(this.record){
         console.log("data was provided")
+        console.log(this.record)
         rData = this.record['data']
       }else{
         rData = await this.ds.getRecord(this.id)
@@ -324,7 +326,7 @@ ${metadata.inputHelp}`
       //console.log(this.cardData)
       this.clearMessage()
       if (this.mode == "new") {
-        const result = await this.ds.newRecord({ data: this.cardData, metadata: { initialRelations: this.initialRelation } })
+        const result = await this.ds.newRecord('flashcard',{ data: this.cardData, metadata: { initialRelations: this.initialRelation } },this.getCardTypeMetadata())
         this.displayMessage(result.type,result.message)
         this.resetAfterInsertNew()
       }else if (this.mode== "edit"){

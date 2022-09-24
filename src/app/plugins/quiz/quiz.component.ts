@@ -30,7 +30,8 @@ export class QuizComponent implements OnInit {
   }
   async loadPage(){
     try {
-      this.metadata = await this.ds.getMetadata() 
+      const mdata = await this.ds.getMetadata()
+      this.metadata = mdata.flashcard
       this.displayPage = true
     } catch (error) {
       console.log(error)

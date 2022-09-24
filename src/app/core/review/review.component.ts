@@ -22,7 +22,8 @@ export class ReviewComponent implements OnInit {
   cards:any;
 
   async loadList(){
-    this.metadata = await this.ds.getMetadata()
+    const mdata = await this.ds.getMetadata()
+    this.metadata = mdata.flashcard
     this.inReview = false
     try {
       const list = await this.ds.reviewList()

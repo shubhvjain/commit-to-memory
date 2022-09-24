@@ -7,17 +7,18 @@ import { BackendService } from 'src/app/backend.service';
 })
 export class NewCardComponent implements OnInit {
 
-  constructor(private ds:BackendService) { }
+  constructor(private ds:BackendService) { this.newType='flashcard' }
   displayPage:boolean = false;
   metadata:any
-
+  newType:string
   ngOnInit(): void {
     this.loadPage()
   }
 
   async loadPage(){
     try {
-      this.metadata = await this.ds.getMetadata() 
+      const mdata = await this.ds.getMetadata()
+      this.metadata = mdata
       this.displayPage = true
     } catch (error) {
       console.log(error)

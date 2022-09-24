@@ -78,9 +78,10 @@ export class ServerDataService {
   async getMetaData(){
     try {
       const req:any = await lastValueFrom(this.http.post(this.base+"/service/"+this.getUserToken().user+"/resetSettings",{},this.getSecureHeader()))
-      return req['data']['data']     
+      return { flashcard:   req['data']['flashcard']['data'] , question: req['data']['question']['data']  }
     } catch (error) {
       this.checkErrorForAuthentication(error)
+      throw error
     }
   }
 
@@ -98,8 +99,19 @@ export class ServerDataService {
     }
   }
 
+  async getFullRecord(id:string){
+    try {
+      const dt:any = await lastValueFrom(this.http.get(this.base+"/record/"+id, this.getSecureHeader()));
+      return dt['data']  
+    } catch (error) {
+      return {}
+    }
+  }
+
   async searchRecord(criteria:any={"structure":"flashcard"}){
-    criteria['structure']="flashcard"
+    if(!criteria['structure']){
+      criteria['structure']="flashcard"
+    }
     const dt:any = await lastValueFrom( this.http.post(this.base+"/record",criteria, this.getSecureHeader()))
     return dt['data']['results']
   }
@@ -125,5 +137,14 @@ export class ServerDataService {
   async deleteCard(id:string){
     const req = await lastValueFrom(this.http.delete(this.base+"/record/"+id ,this.getSecureHeader()))
     return req
+  }
+
+  async getAdditionalSettions(key:string){
+    try {
+      const req:any = await lastValueFrom(this.http.post(this.base+"/service/"+this.getUserToken().user+"/practiceAppSettings",{key:key},this.getSecureHeader()))
+      return req['data']
+    } catch (error:any) {
+      return { type: "danger", message: error.message}
+    }
   }
 }
