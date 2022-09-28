@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input , Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { BackendService } from 'src/app/backend.service';
 
 @Component({
@@ -6,12 +6,15 @@ import { BackendService } from 'src/app/backend.service';
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.css']
 })
-export class QuestionComponent implements OnInit {
+export class QuestionComponent implements OnInit, OnChanges {
   @Input() mode: string;
   @Input() display: any;
   @Input() metadata: any;
-  @Input() record: any
-  @Input() id: any
+  @Input() record: any;
+  @Input() id: any;
+  @Input() practiceId: any
+  @Output() afterPracticeDone = new EventEmitter<any>();
+
 
   initialRelation: string;
   previewIframeName:string;
@@ -26,10 +29,25 @@ export class QuestionComponent implements OnInit {
     this.initialRelation = ""
     this.previewIframeName = this.setRandomId()
   }
-  
+
+  setWindowFn(){
+    const w:any = window
+    let ang = this
+    w['recordQuestionReview'] = (data:any)=>{
+      ang.savePraticeResponse(data)
+    }
+  }
 
   ngOnInit(): void {
     this.loadQuestion()
+    this.setWindowFn()
+  }
+
+  ngOnChanges(sm:SimpleChanges):void{
+    console.log(sm)
+    this.id = sm['id'].currentValue
+    this.loadQuestion()
+    this.setWindowFn()
   }
 
   async loadQuestion() {
@@ -45,16 +63,36 @@ export class QuestionComponent implements OnInit {
     } else {
       await this.loadSavedQuestion()
       
-      if (this.mode == 'preview') {
+      //if (this.mode == 'preview') {
         const ang = this
         setTimeout(async function(){
           await ang.loadQuestionPreview()
         },100)
-        
-      }
+      //}
       if (this.mode == 'practice'){
-        await this.loadQuestionPractice()
+        // await this.loadQuestionPractice()
+        if(!this.practiceId){
+          throw new Error("Practice Id not provided ")
+        }
+        this.checkIfAlreadyReviewed()
       }
+    }
+  }
+
+  checkIfPracticeSessionExists(){
+    const history:any[] = this.queData['practiceHistory']
+    const p = history.find(itm=>{ return itm['practiceId'] == this.practiceId })
+    return p
+  }
+
+  checkIfAlreadyReviewed(){
+    // if practice id already exists display error with 
+    const p = this.checkIfPracticeSessionExists()
+    if(p){
+      const msg = `You have already reviewed this question during this practice session. <br> Answer : ${p.correct} `
+      this.displayMessage('success', msg )
+    }else{
+      this.clearMessage()
     }
   }
 
@@ -64,7 +102,7 @@ export class QuestionComponent implements OnInit {
       let rData:any;
       if(this.record){
         console.log("data was provided")
-        console.log(this.record)
+        //console.log(this.record)
         rData = this.record['data']
       }else{
         rData = await this.ds.getRecord(this.id)
@@ -153,18 +191,112 @@ ${questionMetadata.inputHelp}`
     }
   }
 
-  loadQuestionPreview(){
-    
-  }
-
   getQuestionTypeMetadata(){
     const qTypes: [any] = this.metadata['questionTypes']
     const queMetadata = qTypes.find(itm => { return itm['name'] == this.queData['questionType'] })
     return queMetadata
   }
 
-  loadQuestionPractice(){
-    
+  generateQuestionView(meta:any,data:any,options:{iframeName:string}){
+    const serverConfig = this.ds.getServerConfig()
+    const staticUrl = serverConfig.staticFilesUrl
+    let iframeName = options.iframeName
+    let configs1 = {
+       token: localStorage.getItem('token'),
+       user: localStorage.getItem('user'),
+       baseURL: serverConfig.dataBaseUrl +"/service",
+       baseURL1:serverConfig.dataBaseUrl 
+     }
+     // console.log(configs1)
+     localStorage.setItem("codeConfig", JSON.stringify(configs1))
+     let qw = " ";
+     let defHTML = ` 
+     <script src="${staticUrl}/scripts/codescripts.js"> </script>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+     <div id='result'></div>  `;
+     let defStyle = ` `
+     let jsPart = `  
+     <script type='text/javascript'> 
+     var height;
+ resize = () => {
+ if (height !== document.getElementById('result').offsetHeight) {
+   let iframeName = "${iframeName}"
+   height = document.getElementById('result').offsetHeight;
+   window.parent.postMessage({
+     frameHeight: height,
+     iframeName: iframeName
+   }, '*');
+ }
+ }
+     window.onresize = () => resize();
+     window.onload= async function(){
+       resize()
+       function print(data=""){
+         let pr = data
+   if(typeof data== "object"){
+     pr = "<pre>"+JSON.stringify(data,null,1)+'<\pre>'
+   }
+   document.getElementById("result").innerHTML += pr
+   resize()
+       }
+       async function loadJS(file){
+         return new Promise((resolve,reject)=>{
+           let a = this;
+           let myScript = document.createElement("script");
+           myScript.setAttribute("src",file);
+           document.body.appendChild(myScript);
+           myScript.addEventListener("load", scriptLoaded, false);
+           function scriptLoaded() {resolve()}
+         })
+     }
+     function loadCSS(file){
+       var fileref = document.createElement("link");
+       fileref.rel = "stylesheet";
+       fileref.type = "text/css";
+       fileref.href = file;
+       document.getElementsByTagName("head")[0].appendChild(fileref)
+     }
+     function mdToHTML(text){
+      return marked.parse(text)
+    }
+    function renderMaths(){
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub])
+    }
+    function  savePracticeSessionResult(data){
+      if(window.parent.recordQuestionReview){
+        window.parent.recordQuestionReview(data);
+      }else{
+        console.log("recordQuestionReview not found")
+      }
+    }
+    function getCurrentTimeUTC(){
+      return Math.floor(new Date().getTime() / 1000)
+    }
+
+    const reviewData = {
+      input: ${JSON.stringify(data)},
+      questionMetadata:  ${JSON.stringify(meta)}
+     }
+     ${meta["question"]}
+    }
+     </script>`
+     qw = defHTML + defStyle + jsPart
+     return qw
+
+  }
+//   generateFlashcardView(cardTypeMetaData:any, fcData:any, options:{iframeName:string}) {
+
+  loadQuestionPreview(){
+    const meta = this.getQuestionTypeMetadata()
+    const preview = this.generateQuestionView(meta,this.queData['content'],{iframeName:this.previewIframeName})
+    const ifr:any = document.getElementById(this.previewIframeName)
+        if (ifr) {
+          var code = ifr['contentWindow'].document;
+          code.open();
+          code.write(preview);
+          code.close();
+        }
   }
 
   resetFormData(){
@@ -178,21 +310,20 @@ ${questionMetadata.inputHelp}`
   }
 
   setRandomId(){
-    return "previewIframe-"+Math.floor(Math.random() * (10000) + 1)
+    return "queIframe-"+Math.floor(Math.random() * (10000) + 1)
   }
-
-
 
   showMessage: boolean = false;
   message: { type: string, text: string } = { text: "", type: "" }
   clearMessage() {
+    this.message.text = ''
+    this.message.type=''
     this.showMessage = false;
   }
   displayMessage(type: string = "info", text: string = "Alert...", fade: number = 0) {
     this.message.text = text
     this.message.type = type
     this.showMessage = true
-
   }
 
   changeNewQuestionType(newQueType: Event) {
@@ -242,4 +373,40 @@ ${questionMetadata.inputHelp}`
     this.queData['tags'] = dataToRetain.tags
   }
 
+  async storePracticeHistoryInDB(){
+    const dataToSave = {
+      practiceHistory: this.queData['practiceHistory'],
+      tags: this.queData['tags']
+    }
+    const result = await this.ds.updateRecord(this.id,dataToSave)
+  }
+
+  async savePraticeResponse(data:any){
+    // data validatiomn
+    if(!data.hasOwnProperty('correct')){throw new Error("'correct' value not provided")}
+    if(!data.hasOwnProperty('timeTaken')){throw new Error("'timeTaken' value not provided")}
+    let practice = {
+      ...data,
+      practiceId: this.mode=='practice'? this.practiceId: 'randomReview',
+      onLocal: new Date(),
+      practiceDateUTC: new Date().toUTCString()
+    }
+
+    if(this.mode=='practice'){
+      if(this.checkIfPracticeSessionExists()){
+        this.displayMessage('danger',"You have already reviewed this question in this practice session")
+        this.afterPracticeDone.emit(null)
+
+      }else{
+        this.queData['practiceHistory'].push(practice)
+        await this.storePracticeHistoryInDB()
+        this.afterPracticeDone.emit(practice)
+      }
+    }else{
+      // still store the result for later analysis 
+      this.queData['practiceHistory'].push(practice)
+      await this.storePracticeHistoryInDB()
+    }
+    //console.log(this.queData)
+  }
 }

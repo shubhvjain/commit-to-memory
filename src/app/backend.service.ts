@@ -125,7 +125,7 @@ export class BackendService {
     const requestData = { data: fullData.data, structure: type, metadata: meta }
     this.validateNewRecord(type,requestData,typeMetadata['dataValidation'],'new')
     const newRecord: any = await this.sds.newRecord(requestData)
-    return { type: 'success', message: `New ${type} created. <a href="/core/edit/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Edit</a> , <a href="/core/preview/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Preview</a>` }
+    return { newId: newRecord['data']['newId'] ,type: 'success', message: `New ${type} created. <a href="/core/edit/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Edit</a> , <a href="/core/preview/${newRecord['data']['newId']}" target="_blank" rel="noopener noreferrer">Preview</a>` }
   }
 
   async reviewList() {

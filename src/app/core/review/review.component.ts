@@ -90,6 +90,10 @@ export class ReviewComponent implements OnInit {
          })
       }
     }
+    
+    // randomize question order:
+    this.reviewIds  = this.reviewIds.sort(() => Math.random() - 0.5);
+
     queries[query]({tagName: this.inputTagName})
     //console.log(this.reviewIds)
     if(this.reviewIds.length>0){

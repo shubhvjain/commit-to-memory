@@ -1,0 +1,124 @@
+<div class="row fw-lighter">
+  <div class="col-lg-8 mx-auto">
+    <nav class="navbar navbar-expand-sm bg-light p-1">
+      <div class="container-fluid">
+        <!-- <a class="navbar-brand" href="#">Navbar</a> -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"> 
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                  <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                </svg> Home
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>
+<div class="row fw-lighter" *ngIf="pageLoaded" >
+  <div class="col-lg-6 mx-auto">
+    <div *ngIf="inPractice">
+      <div class="d-flex border-bottom">
+        <div class="p-2">
+          <button class="btn btn-sm btn-light" (click)="finishPractice()"> Finish session  </button>
+        </div>
+        <div class="p-2 flex-grow-1"></div>
+        <div class="p-2">
+        ({{currentIndex+1}} or {{questionIds.length}}  questions) 
+          <button (click)="loadPreviousQuestion()" type="button" class="btn btn-light fw-lighter mr-1 ml-1">Previous</button> &nbsp;
+          <button (click)="loadNextQuestion()" type="button" class="btn btn-light fw-lighter ml-1 mr-1">Next</button>
+        </div>
+      </div>
+      <div *ngIf="loadQuestionPreview">
+        <question  (afterPracticeDone)="handleAfterPractice($event)" [metadata]="metadata" mode="practice" [id]="questionIds[currentIndex]" [practiceId]="practiceId" ></question>
+      </div>
+    </div>
+    <div *ngIf="!inPractice">
+      <br><br><br>
+    <div class="card">
+      <div class="card-body">
+        <h4>New Practice Session</h4>
+        <hr>
+        <div class="form-group row">
+          <label for="inputPassword" class="col-sm-2 col-form-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="inputPassword" [(ngModel)]="newPractice['title']">
+          </div>
+        </div>
+        <h5 class="p-1">
+          Question search critera :
+        </h5>
+        <div class="form-group row">
+          <label for="inputPassword" class="col-sm-3 col-form-label">Tags</label>
+          <div class="col-sm-9">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="newPractice['query']['tags']"></tag-input>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputPassword" class="col-sm-3 col-form-label">Question Type</label>
+          <div class="col-sm-9">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="newPractice['query']['questionType']"></tag-input>
+          </div>
+        </div>
+        <h5  class="p-1">
+          Other options :
+        </h5>
+        <!-- <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" [(ngModel)]="newPractice['flags']['timed']"  >
+          <label class="form-check-label" for="defaultCheck1">
+            Timed (finish session after time is over)
+          </label>
+        </div> -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" [(ngModel)]="newPractice['flags']['randomOrder']" >
+          <label class="form-check-label" for="defaultCheck1">
+            Randomize question order
+          </label>
+        </div>
+        <!-- <div class="form-group row">
+          <label for="recTime" class="col-sm-6 col-form-label">Recommended time (minutes)</label>
+          <div class="col-sm-6">
+            <input type="number" class="form-control" id="recTime" [(ngModel)]="newPractice['settings']['recTim']" >
+          </div>
+        </div> -->
+        <button class=" m-1 btn  btn-dark" (click)="checkQuery()"> Fetch questions </button>
+        <span>  Found {{newPractice.questions.length}} questions </span>
+        <br>
+        <div *ngIf="newPractice.questions.length>0">
+          <hr>
+          <button  class=" m-1 btn  btn-success" (click)="createNewSession()" > Start session </button>
+        </div>
+      </div>
+    </div>
+      <div *ngIf="activePractice.length>0">
+        <br>
+        <div class="card">
+          <div class="card-body">
+            <h4>Active practice sessions</h4>
+            <hr>
+            <ul>
+              <li *ngFor="let p of activePractice"> {{p['data']['title']}}   <button class="btn btn-link" (click)="resumeSession(p)"> Resume </button>  </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!pageLoaded" class="row  fw-lighter">
+  <div class="col-lg-6 mx-auto">
+    <br><br>
+    <div class="card m-2">
+      <div class="card-body">
+        {{loadingMessage}}
+      </div>
+    </div>
+  </div>
+</div>
