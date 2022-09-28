@@ -404,9 +404,13 @@ ${questionMetadata.inputHelp}`
       }
     }else{
       // still store the result for later analysis 
-      this.queData['practiceHistory'].push(practice)
-      await this.storePracticeHistoryInDB()
+      //this.queData['practiceHistory'].push(practice)
+      //await this.storePracticeHistoryInDB()
     }
     //console.log(this.queData)
+  }
+
+  loadPreviewForEdit(){
+    this.loadQuestionPreview()
   }
 }

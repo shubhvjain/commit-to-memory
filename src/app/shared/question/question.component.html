@@ -114,6 +114,20 @@
     <button type="button" class="btn mt-3 btn-lg btn-secondary fw-lighter fs-6" (click)="handleQueAction()" >
       {{ display.action }}
     </button>
+
+    <div class="fw-lighter mt-2">
+      <details>
+        <summary> Sample Preview </summary>
+        <div class="card">
+          <div class="card-body">
+            <button class="btn btn-sm btn-primary" (click)="loadPreviewForEdit()">  See Preview </button>
+            <iframe  [id]="previewIframeName" frameborder="0"  width="100%"></iframe>
+          </div>
+        </div>
+
+      </details>
+    </div>
+
   </div>
   <div *ngIf="mode=='preview'|| mode=='practice'">
        <iframe  [id]="previewIframeName" frameborder="0"  width="100%"></iframe>
