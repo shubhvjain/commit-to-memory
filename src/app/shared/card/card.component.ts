@@ -172,25 +172,12 @@ ${metadata.inputHelp}`
     return data
   }
 
-
   generateFlashcardView(cardTypeMetaData:any, fcData:any, options:{iframeName:string}) {
     const serverConfig = this.ds.getServerConfig()
     const dataInput = fcData;
     let defHTML = ` 
         <script src="${serverConfig.staticFilesUrl}/scripts/codescripts.js"> </script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <script>
-        MathJax.Hub.Config({
-          showMathMenu: true,
-          tex2jax: { inlineMath: [["$", "$"]],displayMath:[["$$", "$$"]] },
-          menuSettings: { zoom: "Double-Click", zscale: "150%" },
-          CommonHTML: { linebreaks: { automatic: true } },
-          "HTML-CSS": { linebreaks: { automatic: true } },
-          SVG: { linebreaks: { automatic: true } }
-        });
-      </script>
         <div id='result'></div>  `;
     let jsPart = `  
         <script type='text/javascript'> 
@@ -207,33 +194,39 @@ ${metadata.inputHelp}`
         }
         window.onresize = () => resize();
         window.onload= async function(){
-          resize()
-      function print(data=""){
-        let pr = data;
-        if(typeof data== "object"){pr = "<pre>"+JSON.stringify(data,null,1)+'<\pre>'}
-        document.getElementById("result").innerHTML += pr
+        function print(data=""){
+          let pr = data;
+          if(typeof data== "object"){pr = "<pre>"+JSON.stringify(data,null,1)+'<\pre>'}
+          document.getElementById("result").innerHTML += pr
         resize()
-      }
-          async function loadJS(file){
-            return new Promise((resolve,reject)=>{
+        }
+        async function loadJS(file){
+          return new Promise((resolve,reject)=>{
               let a = this;let myScript = document.createElement("script");myScript.setAttribute("src",file);document.body.appendChild(myScript);myScript.addEventListener("load", scriptLoaded, false);
               function scriptLoaded() {resolve()}
-            })
+          })
         }
         function loadCSS(file){var fileref = document.createElement("link");fileref.rel = "stylesheet";fileref.type = "text/css";fileref.href = file;document.getElementsByTagName("head")[0].appendChild(fileref);}
-        function mdToHTML(text){
-          return marked.parse(text)
-        }
-        function renderMaths(){
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub])
-        }
-        const reviewData = {
-          input: ${JSON.stringify(dataInput)},
-          cardTypeMetadata:  ${JSON.stringify(cardTypeMetaData)}
-        }
-          ${cardTypeMetaData["display"]}
-        }
-        </script>`;
+        function mdToHTML(text){if(marked){return marked.parse(text)}}
+        function renderMaths(){if(MathJax){MathJax.Hub.Queue(["Typeset", MathJax.Hub])}
+      }
+      const reviewData = {
+        input: ${JSON.stringify(dataInput)},
+        cardTypeMetadata:  ${JSON.stringify(cardTypeMetaData)}
+      }
+      await loadJS('https://cdn.jsdelivr.net/npm/marked/marked.min.js')
+      await loadJS('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML')
+      MathJax.Hub.Config({
+        showMathMenu: true,
+        tex2jax: { inlineMath: [["$", "$"]],displayMath:[["$$", "$$"]] },
+        menuSettings: { zoom: "Double-Click", zscale: "150%" },
+        CommonHTML: { linebreaks: { automatic: true } },
+        "HTML-CSS": { linebreaks: { automatic: true } },
+        SVG: { linebreaks: { automatic: true } }
+      });
+      ${cardTypeMetaData["display"]}
+    }
+    </script>`;
     let qw = defHTML + jsPart;
     return qw;
   }

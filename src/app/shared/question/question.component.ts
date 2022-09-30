@@ -278,7 +278,17 @@ ${questionMetadata.inputHelp}`
       input: ${JSON.stringify(data)},
       questionMetadata:  ${JSON.stringify(meta)}
      }
-     ${meta["question"]}
+     await loadJS('https://cdn.jsdelivr.net/npm/marked/marked.min.js')
+     await loadJS('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML')
+     MathJax.Hub.Config({
+       showMathMenu: true,
+       tex2jax: { inlineMath: [["$", "$"]],displayMath:[["$$", "$$"]] },
+       menuSettings: { zoom: "Double-Click", zscale: "150%" },
+       CommonHTML: { linebreaks: { automatic: true } },
+       "HTML-CSS": { linebreaks: { automatic: true } },
+       SVG: { linebreaks: { automatic: true } }
+     });
+    ${meta["question"]}
     }
      </script>`
      qw = defHTML + defStyle + jsPart
