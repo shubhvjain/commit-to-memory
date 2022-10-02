@@ -71,7 +71,7 @@ export class ReviewComponent implements OnInit {
   startReview(query:string='all'){
     this.reviewIds = []
     this.currentIndex = 0
-    const alldt:[any] = this.cards['records']
+    const alldt:[any] = this.cards['records'].sort((a:any,b:any)=>{ return Math.random() })
     const queries:any = {
       'all':()=>{
         alldt.forEach(itm=>{  this.reviewIds.push(itm['_id'])  })
@@ -92,7 +92,7 @@ export class ReviewComponent implements OnInit {
     }
     
     // randomize question order:
-    this.reviewIds  = this.reviewIds.sort(() => Math.random() - 0.5);
+    // this.reviewIds  = this.reviewIds.sort((a:any,b:any) => { return Math.random()});
 
     queries[query]({tagName: this.inputTagName})
     //console.log(this.reviewIds)
