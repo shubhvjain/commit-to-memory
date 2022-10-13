@@ -1,0 +1,144 @@
+<div *ngIf="displayQue">
+  <div *ngIf="mode == 'new' || mode == 'edit'">
+    <nav class="navbar  border-bottom mb-3">
+      <div class="container-fluid">
+        <a class="navbar-brand  fw-lighter ">{{ display.title }}</a>
+        <div class="d-flex" role="search">
+          <select class="form-select  fw-lighter "
+          [disabled] = "mode=='edit'" 
+          (change)="changeNewQuestionType($event)"
+          [(ngModel)]="queData['questionType']"
+          >
+            <option value="none" selected>Select type</option>
+            <option value="{{qType.name}}" *ngFor="let qType of metadata.questionTypes">
+              {{qType.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </nav>
+
+    <details class="fw-lighter">
+      <summary>Help</summary>
+      <div class="fw-lighter" [innerHTML]="questionHelp | markdown"></div>
+    </details>
+
+    <div *ngFor="let formItem of formData" >
+      <ng-template [ngIf]="formItem.type=='text'">
+        <div class="mb-3 mt-2">
+          <label
+            for="exampleFormControlTextarea1"
+            class="form-label fw-lighter fs-5 text-muted"
+            >{{formItem.title}}:</label>
+          <textarea
+            [(ngModel)]="queData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5"
+            id="exampleFormControlTextarea1"
+            rows="3"
+          ></textarea>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='text1'">
+        <div class="mb-3 mt-2">
+          <label
+            class="form-label fw-lighter fs-5 text-muted">{{formItem.title}}:</label>
+          <input
+            type="text"
+            [(ngModel)]="queData['content'][formItem.title]"
+            class="form-control fw-lighter fs-5">
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='boolean'">
+        <div class="form-check fw-lighter fs-5">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="queData['content'][formItem.title]" >
+          <label class="form-check-label" for="flexCheckChecked">
+            {{formItem.title}}
+          </label>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='enum'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <select class="form-select  fw-lighter " [(ngModel)]="queData['content'][formItem.title]" >
+              <option value="none">Select</option>
+              <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
+            </select>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="formItem.type=='tags'">
+        <div class="row  mt-2 fw-lighter fs-5">
+          <div class="col-lg-4 p-2">
+            {{formItem.title}}
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="queData['content'][formItem.title]"></tag-input>
+          </div>
+        </div>
+      </ng-template>      
+    </div>
+
+    <div class="card  text-bg-light border border-0 mt-4">
+      <div class="card-body">
+        <!-- <h6 class="card-title fw-lighter ">Metadata</h6> -->
+        <div class="row mt-2  fw-lighter fs-6">
+          <div class="col-lg-4 p-2">
+            Title
+          </div>
+          <div class="col-lg-8">
+            <input type="text" class="form-control " id="exampleFormControlInput1" [(ngModel)]="queData['title']">
+          </div>
+        </div>
+        <div class="row   fw-lighter fs-6">
+          <div class="col-lg-4 p-3">
+            Tags
+          </div>
+          <div class="col-lg-8">
+            <tag-input [modelAsStrings]='true' [(ngModel)]="queData['tags']"></tag-input>
+          </div>
+        </div>
+        <div class="row mt-2  fw-lighter fs-6" *ngIf="mode=='new'">
+          <div class="col-lg-4 p-2">
+            Initial Relation
+          </div>
+          <div class="col-lg-8">
+            <input type="text" class="form-control " id="exampleFormControlInput1" [(ngModel)]="initialRelation">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button type="button" class="btn mt-3 btn-lg btn-secondary fw-lighter fs-6" (click)="handleQueAction()" >
+      {{ display.action }}
+    </button>
+
+    <div class="fw-lighter mt-2">
+      <details>
+        <summary> Sample Preview </summary>
+        <div class="card">
+          <div class="card-body">
+            <button class="btn btn-sm btn-primary" (click)="loadPreviewForEdit()">  See Preview </button>
+            <iframe  [id]="previewIframeName" frameborder="0"  width="100%"></iframe>
+          </div>
+        </div>
+
+      </details>
+    </div>
+
+  </div>
+  <div *ngIf="mode=='preview'|| mode=='practice'">
+       <iframe  [id]="previewIframeName" frameborder="0"  width="100%"></iframe>
+  </div>
+</div>
+<div *ngIf="!displayQue">Loading...</div>
+<div  class="mt-2" *ngIf="showMessage">
+  <div class="alert alert-{{message.type}} d-flex align-items-center" role="alert">
+    <button (click)="clearMessage()" type="button" class="btn btn-sm btn-light1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+      <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+    </svg></button>
+    <div class="ps-3" [innerHTML]="message.text"></div>
+  </div>
+</div>

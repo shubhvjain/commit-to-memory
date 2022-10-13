@@ -14,6 +14,7 @@ import { EditCardComponent } from './edit-card/edit-card.component';
 import { LoginComponent } from './login/login.component';
 
 import { SharedModule } from '../shared/shared.module';
+import { PracticeComponent } from './practice/practice.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { SharedModule } from '../shared/shared.module';
     ReviewComponent,
     // CardComponent,
     EditCardComponent,
-    LoginComponent
+    LoginComponent,
+    PracticeComponent
   ],
   imports: [
     TagInputModule,

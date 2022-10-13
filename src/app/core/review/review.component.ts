@@ -22,7 +22,8 @@ export class ReviewComponent implements OnInit {
   cards:any;
 
   async loadList(){
-    this.metadata = await this.ds.getMetadata()
+    const mdata = await this.ds.getMetadata()
+    this.metadata = mdata.flashcard
     this.inReview = false
     try {
       const list = await this.ds.reviewList()
@@ -30,6 +31,7 @@ export class ReviewComponent implements OnInit {
       if(list.records.length>0){
         this.pageLoaded = true
         this.cards =  list
+        this.computeStats()
       } else{
         this.loadingMessage = "No cards to review as of yet. Refresh page or check back later."
         this.pageLoaded = false
@@ -44,10 +46,32 @@ export class ReviewComponent implements OnInit {
   currentIndex:number=-1
   inputTagName:string = "";
 
+  cardTags:any = {}
+  cardTagArray:string[] = []
+  computeStats(){
+    const list:any[] = this.cards['records']
+    list.map(itm=>{
+      const tgs:any[] = itm['data']['tags']
+      tgs.map(tagVal=>{
+        if(!this.cardTags[tagVal]){
+          this.cardTags[tagVal] = 0
+          this.cardTagArray.push(tagVal)
+        }
+        this.cardTags[tagVal] += 1
+      })
+    })
+    this.cardTagArray = this.cardTagArray.sort()
+  }
+
+  loadTag(tagName:any){
+    this.inputTagName = tagName
+    this.startReview('tag')
+  }
+  
   startReview(query:string='all'){
     this.reviewIds = []
     this.currentIndex = 0
-    const alldt:[any] = this.cards['records']
+    const alldt:[any] = this.cards['records'].sort((a:any,b:any)=>{ return Math.random() })
     const queries:any = {
       'all':()=>{
         alldt.forEach(itm=>{  this.reviewIds.push(itm['_id'])  })
@@ -66,6 +90,9 @@ export class ReviewComponent implements OnInit {
          })
       }
     }
+    
+    // randomize question order:
+    // this.reviewIds  = this.reviewIds.sort((a:any,b:any) => { return Math.random()});
 
     queries[query]({tagName: this.inputTagName})
     //console.log(this.reviewIds)
@@ -76,7 +103,6 @@ export class ReviewComponent implements OnInit {
       alert("No cards found")
     }
   }
-
 
   loadNextCard(){
     this.loadCardPreview = false
@@ -93,5 +119,4 @@ export class ReviewComponent implements OnInit {
     console.log(data)
     this.loadNextCard()
   }
-
 }

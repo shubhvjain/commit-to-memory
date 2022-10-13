@@ -17,18 +17,78 @@
               </a>
             </li>
           </ul>
-          <div class="d-flex" role="search">
-            <div class="input-group mb-3">
-              <input type="text" class="form-control fw-lighter" placeholder="Search..." aria-label="Search..." aria-describedby="button-addon2" [(ngModel)]="query">
-              <button class="btn btn-outline-secondary fw-lighter" type="button" id="button-addon2" (click)="search()" >Search</button>
-            </div>
-            
-          </div>
         </div>
       </div>
     </nav>
   </div>
 </div>
+
+
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="row  scrolling-wrapper-flexbox " style="font-size: 14px;">
+      <div class="col-lg-4 col-sm-4 innerBox text-center card" *ngFor="let filter of queries;let i = index" style="border:1px solid rgba(0, 0, 0, 0.04)" >
+        <div class="card-body pt-2 pb-1 mb-2 ">
+          <button class="btn btn-sm btn-link" (click)="toggleForm(i)" >{{filter.data.title}}</button>
+          <div *ngIf="filter.showForm">
+            <div class="row"  *ngFor="let formItem of filter.inputForm"  >
+              <div class="col-lg-12">
+                <ng-template [ngIf]="formItem.type=='text1'">
+                  <div class="mb-3 mt-2">
+                    <label
+                      class="form-label fw-lighter fs-5 text-muted">{{formItem.title}}:</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="filter.inputData[formItem.title]"
+                      class="form-control fw-lighter fs-5">
+                  </div>
+                </ng-template>
+                <ng-template [ngIf]="formItem.type=='text'">
+                  <div class="d-flex">
+                    <div class="p-2 flex-fill">
+                      <label
+                      for="exampleFormControlTextarea1"
+                      class="form-label fw-lighter fs-6 text-muted"
+                      >{{formItem.title}}</label>
+                    </div>
+                    <div class="p-2 flex-fill">
+                      <textarea
+                      [(ngModel)]="filter.inputData[formItem.title]"
+                      class="form-control fw-lighter fs-6"
+                      id="exampleFormControlTextarea1"
+                      rows="1"></textarea>
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template [ngIf]="formItem.type=='boolean'">
+                  <div class="form-check fw-lighter fs-6">
+                    <input class="form-check-input " type="checkbox" value="" id="flexCheckChecked" [(ngModel)]="filter.inputData[formItem.title]" >
+                    <label class="form-check-label  fw-lighter" for="flexCheckChecked">
+                      {{formItem.title}}
+                    </label>
+                  </div>
+                </ng-template>
+                <ng-template [ngIf]="formItem.type=='enum'">
+                  <div class="d-flex fw-lighter fs-6">
+                    <div class="p-2 flex-fill">{{formItem.title}}</div>
+                    <div class="p-2 flex-fill"><select class="form-select  fw-lighter " [(ngModel)]="filter.inputData[formItem.title]" >
+                      <option value="none">Select</option>
+                      <option value="{{item}}" *ngFor="let item of  formItem.items" value="1">{{item}}</option>
+                    </select></div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-link" (click)="closeForm(i)" >Close</button>
+            <button class="btn btn-sm btn-dark ml-2 " (click)="runQuery(i)" >Search </button>
+          </div>
+            
+        </div>              
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row fw-lighter" *ngIf="results.length>0">
   <div class="col-lg-8 mx-auto">
     <div class="d-flex">
@@ -54,7 +114,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let card of results" >
-            <td>{{card['data']['cardType']}}</td>
+            <td>{{card['data']['cardType']? card['data']['cardType']:card['data']['questionType'] }}</td>
             <td>
               <span class="badge text-bg-light fw-lighter m-1">Id: {{card['_id']}}</span>
               <span *ngFor="let tag of card['data']['tags']" class="badge text-bg-secondary fw-lighter m-1">{{tag}}</span> 

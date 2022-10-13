@@ -12,5 +12,13 @@
   <div class="container-fluid">
     <app-root></app-root>
   </div>
+
+  <script>
+    window.onmessage = (e) => {
+  if (e.data.hasOwnProperty("frameHeight")) {
+    document.getElementById(e.data.iframeName+"").style.height = `${e.data.frameHeight +25}px`;
+  }
+};
+    </script>
 </body>
 </html>

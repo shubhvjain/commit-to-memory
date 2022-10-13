@@ -10,11 +10,13 @@ import { BackendService } from 'src/app/backend.service';
 })
 export class EditCardComponent implements OnInit {
 
-  constructor(private ds:BackendService,private _Activatedroute:ActivatedRoute) { this.id="" }
+  constructor(private ds:BackendService,private _Activatedroute:ActivatedRoute) { this.id="";this.recordType="" }
   displayPage:boolean = false;
   metadata:any
   id:any;
   mode:any;
+  recordType:string
+  recordData:any
   iframeMode:boolean = false
   ngOnInit(): void {
     
@@ -33,7 +35,11 @@ export class EditCardComponent implements OnInit {
 
   async loadPage(){
     try {
-      this.metadata = await this.ds.getMetadata() 
+      const mdata = await this.ds.getMetadata()
+      this.metadata = mdata
+      const recordData = await this.ds.getRecord(this.id,true)
+      this.recordType = recordData['structure']
+      this.recordData = recordData
       this.displayPage = true
     } catch (error) {
       console.log(error)
