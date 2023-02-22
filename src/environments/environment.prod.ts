@@ -1,9 +1,9 @@
 export const environment = {
   production: true,
-  backendServerUrl:"https://svja.in.net",
+  backendServerUrl:"https://api.svja.in",
   serverConfigs: {
-    mediaBaseUrl:"https://svja.in.net",
-    dataBaseUrl:"https://svja.in.net",
+    mediaBaseUrl:"https://api.svja.in",
+    dataBaseUrl:"https://api.svja.in",
     staticFilesUrl:"https://static.svja.in"
   }
 };
